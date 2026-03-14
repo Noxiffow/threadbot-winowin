@@ -35,6 +35,10 @@ class ChatIn(BaseModel):
 class ChatOut(BaseModel):
     reply: str
 
+@app.get("/")
+def root():
+    return {"status": "ok", "bot": "ThreadBot", "endpoint": "POST /chat"}
+
 @app.post("/chat", response_model=ChatOut)
 def chat(body: ChatIn):
     if body.session_id not in sessions:
