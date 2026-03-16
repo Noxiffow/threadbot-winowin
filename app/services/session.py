@@ -1,3 +1,5 @@
+MAX_HISTORY = 20
+
 sessions: dict[str, list] = {}
 
 def get_or_create_session(session_id: str) -> list:
@@ -7,3 +9,5 @@ def get_or_create_session(session_id: str) -> list:
 
 def append_message(session_id: str, role: str, content: str):
     sessions[session_id].append({"role": role, "content": content})
+    if len(sessions[session_id]) > MAX_HISTORY:
+        sessions[session_id] = sessions[session_id][-MAX_HISTORY:]
