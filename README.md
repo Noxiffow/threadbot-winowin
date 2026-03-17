@@ -10,9 +10,9 @@ Proyecto de prácticas en WinoWin · 2026.
 | Fase | Descripción | Estado |
 |------|-------------|--------|
 | 1 | Planificación y diseño | ✅ Completada |
-| 2 | Backend base (FastAPI + Groq) | 🔵 En curso |
-| 3 | Base de datos (PostgreSQL) | ⬜ Pendiente |
-| 4 | Automatizaciones n8n | ⬜ Pendiente |
+| 2 | Backend base (FastAPI + Groq) | ✅ Completada |
+| 3 | Base de datos (PostgreSQL) | ✅ Completada |
+| 4 | Automatizaciones n8n | 🔵 Siguiente |
 | 5 | Interfaz web (frontend) | ⬜ Pendiente |
 | 6 | Pruebas y ajustes | ⬜ Pendiente |
 | 7 | Despliegue en Railway | ⬜ Pendiente |
