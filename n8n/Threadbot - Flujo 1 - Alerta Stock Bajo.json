@@ -1,0 +1,260 @@
+{
+  "name": "Threadbot - Flujo 1 - Alerta Stock Bajo",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "78c985d3-c4ba-4f5c-86c1-71ef953f9b6a",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "url": "http://host.docker.internal:8000/alerts/pending",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "api_key",
+              "value": "threadbot-internal-key"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "fcee8bc4-84f6-490a-9658-14e9352aa805",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "7e7eb473-0b2d-47a4-ad39-20c60b22fff1",
+              "leftValue": "={{ $json.total }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        416,
+        0
+      ],
+      "id": "67cdf392-2466-48ca-aded-907822e971ef",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $input.first().json;\nconst alertas = data.alertas;\n\nlet filas = alertas.map(a => \n  `<tr>\n    <td style=\"padding:8px;border:1px solid #ddd;\">${a.mensaje}</td>\n    <td style=\"padding:8px;border:1px solid #ddd;\">${a.fecha}</td>\n  </tr>`\n).join('');\n\nconst htmlEmail = `\n  <p>Estimado proveedor,</p>\n  <p>Le informamos de que los siguientes productos necesitan reposición urgente en ThreadCo:</p>\n  <table style=\"border-collapse:collapse;width:100%;\">\n    <tr style=\"background:#f2f2f2;\">\n      <th style=\"padding:8px;border:1px solid #ddd;\">Producto</th>\n      <th style=\"padding:8px;border:1px solid #ddd;\">Fecha</th>\n    </tr>\n    ${filas}\n  </table>\n  <p>Por favor, gestione el envío a la mayor brevedad posible.</p>\n  <p>Gracias,<br>ThreadCo</p>\n`;\n\nconst ids = alertas.map(a => a.id);\n\nreturn [{ json: { htmlEmail, ids, total: alertas.length } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        624,
+        -224
+      ],
+      "id": "1b1775c6-8b64-48fd-8630-74621eecca12",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.resend.com/emails",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer re_P415sy5B_6JrrG8fQzc3rngMWk6AViKoH"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "from",
+              "value": "ThreadBot <onboarding@resend.dev>"
+            },
+            {
+              "name": "to",
+              "value": "natescripts@gmail.com"
+            },
+            {
+              "name": "subject",
+              "value": "⚠ Reposición de stock necesaria — ThreadCo"
+            },
+            {
+              "name": "html",
+              "value": "={{ $json.htmlEmail }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        880,
+        -96
+      ],
+      "id": "403d2407-b713-447f-80e6-1176dbfffa4d",
+      "name": "Resend"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://host.docker.internal:8000/alerts/{{ $('HTTP Request').first().json.alertas[$itemIndex].id }}/mark-sent",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "api_key",
+              "value": "threadbot-internal-key"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1312,
+        -96
+      ],
+      "id": "f5044964-7178-4609-a69e-78f2a2c8026f",
+      "name": "mark-sent"
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $('HTTP Request').first().json;\nconst ids = data.alertas.map(a => a.id);\n\nreturn ids.map(id => ({ json: { alerta_id: parseInt(id) } }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1088,
+        -96
+      ],
+      "id": "63c4d908-d3a0-41f1-b050-ae326a4390f1",
+      "name": "Code in JavaScript1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Resend",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Resend": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "mark-sent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "281f57e1-569c-4c64-a430-5df405e8c382",
+  "meta": {
+    "instanceId": "53533903e322280d4ac721d563310cce1e75e76f140e34a2aa1cb217def3c406"
+  },
+  "id": "AUnF1unf0KOjv4TY",
+  "tags": []
+}

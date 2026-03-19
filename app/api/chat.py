@@ -2,6 +2,8 @@ from fastapi import APIRouter, HTTPException
 from app.schemas.chat_schemas import ChatIn, ChatOut
 from app.services.llm_service import chat_with_bot
 from app.services.orders import get_pedido
+from app.models.db_models import Alerta
+from app.services.database import SessionLocal
 
 router = APIRouter()
 
@@ -35,3 +37,51 @@ def consultar_pedido(pedido_id: int):
         "email_cliente": pedido.email_cliente,
         "total": pedido.total_cents / 100
     }
+
+@router.get("/alerts/pending")
+def alertas_pendientes(api_key: str = ""):
+    if api_key != "threadbot-internal-key":
+        raise HTTPException(status_code=401, detail="No autorizado")
+
+    db = SessionLocal()
+    try:
+        alertas = db.query(Alerta).filter(Alerta.enviada == False).all()
+        return {
+            "total": len(alertas),
+            "alertas": [
+                {
+                    "id": a.id,
+                    "tipo": a.tipo,
+                    "producto_id": a.producto_id,
+                    "mensaje": a.mensaje,
+                    "fecha": str(a.fecha)
+                }
+                for a in alertas
+            ]
+        }
+    finally:
+        db.close()
+
+@router.post("/alerts/{alerta_id}/mark-sent")
+def marcar_alerta_enviada(alerta_id: int, api_key: str = ""):
+    if api_key != "threadbot-internal-key":
+        raise HTTPException(status_code=401, detail="No autorizado")
+
+    db = SessionLocal()
+    try:
+        alerta = db.query(Alerta).filter(Alerta.id == alerta_id).first()
+
+        if not alerta:
+            raise HTTPException(status_code=404, detail="Alerta no encontrada")
+
+        alerta.enviada = True
+        db.commit()
+        db.refresh(alerta)
+
+        return {
+            "ok": True,
+            "id": alerta.id,
+            "enviada": alerta.enviada
+        }
+    finally:
+        db.close()
