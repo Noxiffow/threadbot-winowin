@@ -93,12 +93,13 @@
       "parameters": {
         "method": "POST",
         "url": "https://api.resend.com/emails",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
             {
-              "name": "Authorization",
-              "value": "Bearer re_P415sy5B_6JrrG8fQzc3rngMWk6AViKoH"
+              "name": "Authorization"
             },
             {
               "name": "Content-Type",
@@ -136,7 +137,13 @@
         -96
       ],
       "id": "403d2407-b713-447f-80e6-1176dbfffa4d",
-      "name": "Resend"
+      "name": "Resend",
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "a0Pj0Av3jW0gUKwF",
+          "name": "Bearer Auth account"
+        }
+      }
     },
     {
       "parameters": {
@@ -173,7 +180,7 @@
         -96
       ],
       "id": "63c4d908-d3a0-41f1-b050-ae326a4390f1",
-      "name": "Code in JavaScript1"
+      "name": "Separador de items"
     }
   ],
   "pinData": {},
@@ -226,14 +233,14 @@
       "main": [
         [
           {
-            "node": "Code in JavaScript1",
+            "node": "Separador de items",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Code in JavaScript1": {
+    "Separador de items": {
       "main": [
         [
           {
@@ -251,7 +258,7 @@
     "binaryMode": "separate",
     "availableInMCP": false
   },
-  "versionId": "281f57e1-569c-4c64-a430-5df405e8c382",
+  "versionId": "c2c424e3-f842-402f-8b46-cc649c1e84fd",
   "meta": {
     "instanceId": "53533903e322280d4ac721d563310cce1e75e76f140e34a2aa1cb217def3c406"
   },
