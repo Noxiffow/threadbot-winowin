@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException
 from app.schemas.chat_schemas import ChatIn, ChatOut
 from app.services.llm_service import chat_with_bot
 from app.services.orders import get_pedido
-from app.models.db_models import Alerta
+from app.models.db_models import Alerta, Pedido
 from app.services.database import SessionLocal
 
 router = APIRouter()
@@ -82,6 +82,47 @@ def marcar_alerta_enviada(alerta_id: int, api_key: str = ""):
             "ok": True,
             "id": alerta.id,
             "enviada": alerta.enviada
+        }
+    finally:
+        db.close()
+
+@router.post("/orders/{pedido_id}/confirm")
+def confirmar_pedido(pedido_id: int, api_key: str = ""):
+    if api_key != "threadbot-internal-key":
+        raise HTTPException(status_code=401, detail="No autorizado")
+    db = SessionLocal()
+    try:
+        pedido = db.query(Pedido).filter(Pedido.id == pedido_id).first()
+        if not pedido:
+            raise HTTPException(status_code=404, detail="Pedido no encontrado")
+        pedido.estado = "confirmado"
+        db.commit()
+        db.refresh(pedido)
+
+        # Notificar a n8n
+        try:
+            import httpx
+            webhook_url = "http://localhost:5678/webhook/order-confirmed"
+            payload = {
+                "pedido_id": pedido.id,
+                "estado": pedido.estado,
+                "nombre_cliente": pedido.nombre_cliente,
+                "email_cliente": pedido.email_cliente,
+                "direccion": pedido.direccion,
+                "total": pedido.total_cents / 100
+            }
+            httpx.post(webhook_url, json=payload, timeout=5)
+        except Exception:
+            pass
+
+        return {
+            "ok": True,
+            "pedido_id": pedido.id,
+            "estado": pedido.estado,
+            "nombre_cliente": pedido.nombre_cliente,
+            "email_cliente": pedido.email_cliente,
+            "direccion": pedido.direccion,
+            "total": pedido.total_cents / 100
         }
     finally:
         db.close()

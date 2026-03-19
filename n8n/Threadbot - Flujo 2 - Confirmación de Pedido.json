@@ -1,0 +1,92 @@
+{
+  "name": "Threadbot - Flujo 2 - Confirmación de Pedido",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "order-confirmed",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "859f2833-dc7d-412f-9c26-f6fe45cb5c6d",
+      "name": "Webhook",
+      "webhookId": "102d1bc1-9de9-46ce-9ca5-cda483542760"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.resend.com/emails",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "from",
+              "value": "ThreadBot <onboarding@resend.dev>"
+            },
+            {
+              "name": "to",
+              "value": "natescripts@gmail.com"
+            },
+            {
+              "name": "subject",
+              "value": "✅ Pedido confirmado — ThreadCo"
+            },
+            {
+              "name": "html",
+              "value": "=<h2>¡Tu pedido ha sido confirmado!</h2>\n<p>Hola <strong>{{ $json.body.nombre_cliente }}</strong>,</p>\n<p>Tu pedido en ThreadCo ha sido confirmado. Aquí tienes el resumen:</p>\n<table style=\"border-collapse:collapse;width:100%;\">\n  <tr><td style=\"padding:8px;border:1px solid #ddd;\"><strong>Nº de pedido</strong></td><td style=\"padding:8px;border:1px solid #ddd;\">{{ $json.body.pedido_id }}</td></tr>\n  <tr><td style=\"padding:8px;border:1px solid #ddd;\"><strong>Dirección de envío</strong></td><td style=\"padding:8px;border:1px solid #ddd;\">{{ $json.body.direccion }}</td></tr>\n  <tr><td style=\"padding:8px;border:1px solid #ddd;\"><strong>Total</strong></td><td style=\"padding:8px;border:1px solid #ddd;\">{{ $json.body.total }}€</td></tr>\n</table>\n<p>Recibirás tu pedido en los próximos días.</p>\n<p>Gracias por comprar en ThreadCo.</p>"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        176,
+        16
+      ],
+      "id": "26aabb2a-ecf3-4dcb-99ff-75cd485c0eec",
+      "name": "HTTP Request",
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "a0Pj0Av3jW0gUKwF",
+          "name": "Bearer Auth account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "74d925b6-7078-4f29-ad12-f5bbedee0fd3",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "53533903e322280d4ac721d563310cce1e75e76f140e34a2aa1cb217def3c406"
+  },
+  "id": "fUMwUNDVr7sGHQ31",
+  "tags": []
+}
