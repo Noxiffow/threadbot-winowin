@@ -1,0 +1,91 @@
+{
+  "name": "Threadbot - Flujo 4 - Seguimiento de Pedido",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "order-status",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "db0985fd-4923-4b25-b3c5-338c2ccecb72",
+      "name": "Webhook",
+      "webhookId": "f3bf6602-12c9-495d-a294-5ed48adcec90"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.resend.com/emails",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "from",
+              "value": "onboarding@resend.dev"
+            },
+            {
+              "name": "to",
+              "value": "natescripts@gmail.com"
+            },
+            {
+              "name": "subject",
+              "value": "=🚚 Actualización de tu pedido nº {{ $json.body.pedido_id }} — ThreadCo"
+            },
+            {
+              "name": "html",
+              "value": "=<h2>Actualización de tu pedido</h2> <p>Hola <strong>{{ $json.body.nombre_cliente }}</strong>,</p> <p>Tu pedido nº <strong>{{ $json.body.pedido_id }}</strong> ha cambiado de estado:</p> <p style=\"font-size:18px;font-weight:bold;color:#2E75B6;\">{{ $json.body.estado }}</p> <p>{{ $json.body.mensaje }}</p> <p>Gracias por comprar en ThreadCo.</p>"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "3e4c92cb-3956-404f-90dc-862b7e7cfee8",
+      "name": "HTTP Request",
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "a0Pj0Av3jW0gUKwF",
+          "name": "Bearer Auth account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "7e2075f1-d597-4877-a2a5-bb418aeb78ae",
+  "meta": {
+    "instanceId": "53533903e322280d4ac721d563310cce1e75e76f140e34a2aa1cb217def3c406"
+  },
+  "id": "DtPYAgOf4hbE4fYA",
+  "tags": []
+}

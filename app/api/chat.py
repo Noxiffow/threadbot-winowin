@@ -2,8 +2,9 @@ from fastapi import APIRouter, HTTPException
 from app.schemas.chat_schemas import ChatIn, ChatOut
 from app.services.llm_service import chat_with_bot
 from app.services.orders import get_pedido
-from app.models.db_models import Alerta, Pedido
+from app.models.db_models import Alerta, Pedido, SolicitudFactura
 from app.services.database import SessionLocal
+import httpx
 
 router = APIRouter()
 
@@ -86,6 +87,78 @@ def marcar_alerta_enviada(alerta_id: int, api_key: str = ""):
     finally:
         db.close()
 
+@router.post("/invoices/request")
+def solicitar_factura(session_id: str, pedido_id: int, api_key: str = ""):
+    if api_key != "threadbot-internal-key":
+        raise HTTPException(status_code=401, detail="No autorizado")
+    db = SessionLocal()
+    try:
+        pedido = db.query(Pedido).filter(Pedido.id == pedido_id).first()
+        if not pedido:
+            raise HTTPException(status_code=404, detail="Pedido no encontrado")
+        solicitud = SolicitudFactura(
+            session_id=session_id,
+            email_cliente=pedido.email_cliente,
+            pedido_id=pedido_id,
+            procesada=False
+        )
+        db.add(solicitud)
+        db.commit()
+        try:
+            webhook_url = "http://localhost:5678/webhook-test/invoice-request"
+            payload = {
+                "pedido_id": pedido.id,
+                "nombre_cliente": pedido.nombre_cliente,
+                "email_cliente": pedido.email_cliente,
+                "total": pedido.total_cents / 100
+            }
+            httpx.post(webhook_url, json=payload, timeout=5)
+        except Exception as e:
+            print(f"Error webhook n8n: {e}")
+            pass
+        return {"ok": True, "mensaje": "Solicitud de factura registrada correctamente"}
+    finally:
+        db.close()
+
+@router.post("/orders/{pedido_id}/status")
+def actualizar_estado_pedido(pedido_id: int, estado: str, api_key: str = ""):
+    if api_key != "threadbot-internal-key":
+        raise HTTPException(status_code=401, detail="No autorizado")
+    estados_validos = ["pendiente", "confirmado", "enviado", "entregado", "cancelado"]
+    if estado not in estados_validos:
+        raise HTTPException(status_code=400, detail=f"Estado no válido. Opciones: {estados_validos}")
+    db = SessionLocal()
+    try:
+        pedido = db.query(Pedido).filter(Pedido.id == pedido_id).first()
+        if not pedido:
+            raise HTTPException(status_code=404, detail="Pedido no encontrado")
+        pedido.estado = estado
+        db.commit()
+        db.refresh(pedido)
+        mensajes = {
+            "confirmado": "Tu pedido ha sido confirmado y está siendo preparado.",
+            "enviado": "Tu pedido está en camino. Recibirás tu entrega en los próximos días.",
+            "entregado": "Tu pedido ha sido entregado. ¡Esperamos que lo disfrutes!",
+            "cancelado": "Tu pedido ha sido cancelado. Si tienes dudas, contáctanos.",
+            "pendiente": "Tu pedido está pendiente de confirmación."
+        }
+        try:
+            webhook_url = "http://localhost:5678/webhook-test/order-status"
+            payload = {
+                "pedido_id": pedido.id,
+                "nombre_cliente": pedido.nombre_cliente,
+                "email_cliente": pedido.email_cliente,
+                "estado": estado,
+                "mensaje": mensajes.get(estado, "Estado actualizado.")
+            }
+            httpx.post(webhook_url, json=payload, timeout=5)
+        except Exception as e:
+            print(f"Error webhook n8n: {e}")
+            pass
+        return {"ok": True, "pedido_id": pedido.id, "estado": pedido.estado}
+    finally:
+        db.close()
+
 @router.post("/orders/{pedido_id}/confirm")
 def confirmar_pedido(pedido_id: int, api_key: str = ""):
     if api_key != "threadbot-internal-key":
@@ -101,7 +174,6 @@ def confirmar_pedido(pedido_id: int, api_key: str = ""):
 
         # Notificar a n8n
         try:
-            import httpx
             webhook_url = "http://localhost:5678/webhook/order-confirmed"
             payload = {
                 "pedido_id": pedido.id,
