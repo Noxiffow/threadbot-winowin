@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ThreadBot — ThreadCo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=Playfair+Display:wght@600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #0f0f0f;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100dvh;
+      font-family: 'DM Sans', sans-serif;
+      color: #e8e8e8;
+    }
+
+    /* ── WIDGET ── */
+    .widget {
+      width: 100%;
+      max-width: 420px;
+      height: 100dvh;
+      max-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      background: #111111;
+      position: relative;
+      overflow: hidden;
+    }
+
+    @media (min-width: 500px) {
+      body { background: #0a0a0a; }
+      .widget {
+        height: 700px;
+        max-height: 90dvh;
+        border-radius: 16px;
+        border: 1px solid #2a2a2a;
+        box-shadow: 0 32px 80px rgba(0,0,0,0.7), 0 0 0 1px rgba(201,168,76,0.08);
+      }
+    }
+
+    /* ── CABECERA ── */
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 18px 20px;
+      background: #141414;
+      border-bottom: 1px solid #222;
+      flex-shrink: 0;
+    }
+
+    .avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: #1a1a1a;
+      border: 2px solid #c9a84c;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Playfair Display', serif;
+      font-size: 15px;
+      font-weight: 600;
+      color: #c9a84c;
+      flex-shrink: 0;
+      letter-spacing: 0.5px;
+    }
+
+    .header-text { flex: 1; min-width: 0; }
+
+    .bot-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 17px;
+      font-weight: 600;
+      color: #f0f0f0;
+      letter-spacing: 0.3px;
+    }
+
+    .bot-sub {
+      font-size: 11.5px;
+      color: #888;
+      margin-top: 1px;
+      letter-spacing: 0.4px;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #4caf50;
+      box-shadow: 0 0 6px rgba(76,175,80,0.6);
+      flex-shrink: 0;
+    }
+
+    /* ── MENSAJES ── */
+    .messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      scrollbar-width: thin;
+      scrollbar-color: #2a2a2a transparent;
+    }
+
+    .messages::-webkit-scrollbar { width: 4px; }
+    .messages::-webkit-scrollbar-track { background: transparent; }
+    .messages::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 2px; }
+
+    /* Mensaje */
+    .msg {
+      display: flex;
+      flex-direction: column;
+      max-width: 82%;
+      animation: fadeUp 0.22s ease;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .msg.bot  { align-self: flex-start; }
+    .msg.user { align-self: flex-end; }
+
+    .bubble {
+      padding: 11px 15px;
+      border-radius: 14px;
+      font-size: 13.5px;
+      line-height: 1.65;
+      word-break: break-word;
+    }
+
+    .msg.bot .bubble {
+      background: #1a1a1a;
+      color: #e0e0e0;
+      border-left: 3px solid #c9a84c;
+      border-radius: 4px 14px 14px 4px;
+    }
+
+    .msg.user .bubble {
+      background: #c9a84c;
+      color: #0f0f0f;
+      font-weight: 500;
+      border-radius: 14px 4px 14px 14px;
+    }
+
+    .msg-time {
+      font-size: 10.5px;
+      color: #555;
+      margin-top: 4px;
+      padding: 0 4px;
+    }
+
+    .msg.user .msg-time { text-align: right; }
+
+    /* Typing indicator */
+    .typing .bubble {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 14px 18px;
+    }
+
+    .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #c9a84c;
+      animation: bounce 1.2s infinite;
+    }
+
+    .dot:nth-child(2) { animation-delay: 0.2s; }
+    .dot:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes bounce {
+      0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+      30% { transform: translateY(-5px); opacity: 1; }
+    }
+
+    /* ── CHIPS ── */
+    .chips {
+      display: flex;
+      gap: 8px;
+      padding: 0 16px 12px;
+      flex-wrap: wrap;
+      flex-shrink: 0;
+    }
+
+    .chip {
+      background: transparent;
+      border: 1px solid #333;
+      color: #c9a84c;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 12px;
+      padding: 6px 13px;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      white-space: nowrap;
+    }
+
+    .chip:hover {
+      background: rgba(201,168,76,0.1);
+      border-color: #c9a84c;
+    }
+
+    /* ── INPUT ── */
+    .input-area {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 16px 16px;
+      border-top: 1px solid #1e1e1e;
+      background: #111;
+      flex-shrink: 0;
+    }
+
+    .input-wrap {
+      flex: 1;
+      background: #1a1a1a;
+      border: 1px solid #2a2a2a;
+      border-radius: 24px;
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      transition: border-color 0.18s;
+    }
+
+    .input-wrap:focus-within {
+      border-color: #c9a84c;
+    }
+
+    #msg-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #e0e0e0;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13.5px;
+      padding: 12px 0;
+      caret-color: #c9a84c;
+    }
+
+    #msg-input::placeholder { color: #444; }
+
+    #send-btn {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: #c9a84c;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.18s, transform 0.1s;
+      flex-shrink: 0;
+    }
+
+    #send-btn:hover:not(:disabled) { background: #d4b55a; }
+    #send-btn:active:not(:disabled) { transform: scale(0.93); }
+
+    #send-btn:disabled {
+      background: #222;
+      cursor: not-allowed;
+    }
+
+    #send-btn svg { transition: stroke 0.18s; }
+    #send-btn:disabled svg { stroke: #444; }
+
+    /* ── FOOTER ── */
+    .footer {
+      text-align: center;
+      font-size: 10.5px;
+      color: #333;
+      padding: 0 0 10px;
+      letter-spacing: 0.5px;
+    }
+
+    .footer span { color: #555; }
+  </style>
+</head>
+<body>
+
+<div class="widget">
+
+  <!-- CABECERA -->
+  <div class="header">
+    <div class="avatar">TB</div>
+    <div class="header-text">
+      <div class="bot-name">ThreadBot</div>
+      <div class="bot-sub">ThreadCo · Asistente virtual</div>
+    </div>
+    <div class="status-dot"></div>
+  </div>
+
+  <!-- MENSAJES -->
+  <div class="messages" id="messages">
+    <!-- Mensaje de bienvenida -->
+  </div>
+
+  <!-- CHIPS -->
+  <div class="chips" id="chips">
+    <button class="chip" data-msg="Ver catálogo">Ver catálogo</button>
+    <button class="chip" data-msg="¿Cuál es el estado de mi pedido?">Estado de pedido</button>
+    <button class="chip" data-msg="Quiero solicitar una factura">Solicitar factura</button>
+  </div>
+
+  <!-- INPUT -->
+  <div class="input-area">
+    <div class="input-wrap">
+      <input id="msg-input" type="text" placeholder="Escribe tu mensaje..." autocomplete="off" />
+    </div>
+    <button id="send-btn" disabled aria-label="Enviar">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0f0f0f" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="22" y1="2" x2="11" y2="13"></line>
+        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+      </svg>
+    </button>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">Powered by <span>WinoWin</span></div>
+
+</div>
+
+<script>
+  const SESSION_ID = crypto.randomUUID();
+  const API_URL    = "http://localhost:8000/chat";
+
+  const messagesEl = document.getElementById("messages");
+  const inputEl    = document.getElementById("msg-input");
+  const sendBtn    = document.getElementById("send-btn");
+  const chipsEl    = document.getElementById("chips");
+
+  /* ── Utilidades ── */
+  function timeNow() {
+    return new Date().toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" });
+  }
+
+  function scrollBottom() {
+    messagesEl.scrollTo({ top: messagesEl.scrollHeight, behavior: "smooth" });
+  }
+
+  function appendMessage(role, text) {
+    const wrap = document.createElement("div");
+    wrap.className = `msg ${role}`;
+
+    const bubble = document.createElement("div");
+    bubble.className = "bubble";
+    bubble.textContent = text;
+
+    const time = document.createElement("div");
+    time.className = "msg-time";
+    time.textContent = timeNow();
+
+    wrap.appendChild(bubble);
+    wrap.appendChild(time);
+    messagesEl.appendChild(wrap);
+    scrollBottom();
+    return wrap;
+  }
+
+  function showTyping() {
+    const wrap = document.createElement("div");
+    wrap.className = "msg bot typing";
+    wrap.id = "typing";
+
+    const bubble = document.createElement("div");
+    bubble.className = "bubble";
+    bubble.innerHTML = '<div class="dot"></div><div class="dot"></div><div class="dot"></div>';
+
+    wrap.appendChild(bubble);
+    messagesEl.appendChild(wrap);
+    scrollBottom();
+  }
+
+  function removeTyping() {
+    const el = document.getElementById("typing");
+    if (el) el.remove();
+  }
+
+  /* ── Enviar mensaje ── */
+  async function sendMessage(text) {
+    const msg = text.trim();
+    if (!msg) return;
+
+    inputEl.value = "";
+    sendBtn.disabled = true;
+    chipsEl.style.display = "none";
+
+    appendMessage("user", msg);
+    showTyping();
+
+    try {
+      const res = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ session_id: SESSION_ID, message: msg })
+      });
+
+      removeTyping();
+
+      if (!res.ok) {
+        appendMessage("bot", "Lo siento, ha habido un problema. Por favor, inténtalo de nuevo.");
+        return;
+      }
+
+      const data = await res.json();
+      appendMessage("bot", data.reply);
+
+    } catch {
+      removeTyping();
+      appendMessage("bot", "No puedo conectar con el servidor ahora mismo. Inténtalo en unos momentos.");
+    }
+  }
+
+  /* ── Eventos ── */
+  inputEl.addEventListener("input", () => {
+    sendBtn.disabled = inputEl.value.trim() === "";
+  });
+
+  inputEl.addEventListener("keydown", e => {
+    if (e.key === "Enter" && !e.shiftKey && inputEl.value.trim()) {
+      e.preventDefault();
+      sendMessage(inputEl.value);
+    }
+  });
+
+  sendBtn.addEventListener("click", () => sendMessage(inputEl.value));
+
+  chipsEl.querySelectorAll(".chip").forEach(chip => {
+    chip.addEventListener("click", () => sendMessage(chip.dataset.msg));
+  });
+
+  /* ── Bienvenida ── */
+  window.addEventListener("load", () => {
+    appendMessage("bot", "¡Hola! Soy ThreadBot, el asistente de ThreadCo. ¿En qué puedo ayudarte hoy?");
+  });
+</script>
+
+</body>
+</html>
