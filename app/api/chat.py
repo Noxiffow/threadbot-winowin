@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException
 from app.schemas.chat_schemas import ChatIn, ChatOut
 from app.services.llm_service import chat_with_bot
 from app.services.orders import get_pedido
-from app.models.db_models import Alerta, Pedido, SolicitudFactura
+from app.models.db_models import Alerta, Pedido, Producto, SolicitudFactura
 from app.services.database import SessionLocal
 import httpx
 
@@ -156,6 +156,27 @@ def actualizar_estado_pedido(pedido_id: int, estado: str, api_key: str = ""):
             print(f"Error webhook n8n: {e}")
             pass
         return {"ok": True, "pedido_id": pedido.id, "estado": pedido.estado}
+    finally:
+        db.close()
+
+@router.get("/products")
+def listar_productos():
+    db = SessionLocal()
+    try:
+        productos = db.query(Producto).filter(
+            Producto.activo == True
+        ).all()
+        return [
+            {
+                "id": p.id,
+                "nombre": p.nombre,
+                "precio": p.precio_cents / 100,
+                "stock": p.stock,
+                "tallas": p.tallas,
+                "categoria": p.categoria
+            }
+            for p in productos
+        ]
     finally:
         db.close()
 
