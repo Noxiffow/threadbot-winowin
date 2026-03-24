@@ -357,7 +357,7 @@
 
     const bubble = document.createElement("div");
     bubble.className = "bubble";
-    bubble.textContent = text;
+    bubble.innerHTML = text.replace(/\n/g, '<br>');
 
     const time = document.createElement("div");
     time.className = "msg-time";

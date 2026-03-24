@@ -6,36 +6,132 @@ from app.services.orders import crear_pedido
 import re
 import httpx
 
+
 def extraer_datos_pedido(historial: list) -> dict | None:
-    """
-    Analiza el historial buscando los 4 datos del pedido:
-    producto, talla, nombre, dirección, email
-    Devuelve None si no están todos.
-    """
-    texto = " ".join([m["content"] for m in historial]).lower()
+    texto = " ".join([m["content"] for m in historial])
 
-    productos = ["camiseta blanca", "camiseta negra", "sudadera",
-                 "vaqueros", "chaqueta bomber", "shorts cargo"]
-    tallas = ["s", "m", "l", "xl", "28", "30", "32", "34"]
+    # Extraer email
+    email_match = re.search(r'[\w.+-]+@[\w-]+\.[a-z]{2,}', texto)
+    if not email_match:
+        return None
 
-    tiene_producto = any(p in texto for p in productos)
-    tiene_talla = any(f"talla {t}" in texto or f" {t} " in texto for t in tallas)
-    tiene_email = bool(re.search(r'[\w.+-]+@[\w-]+\.[a-z]{2,}', texto))
-    tiene_direccion = any(p in texto for p in ["calle", "avenida", "plaza", "ctra", "camino"])
-    tiene_nombre = len([m for m in historial if m["role"] == "user"]) >= 4
+    # Extraer nombre
+    nombre = "Cliente ThreadCo"
+    nombre_patterns = [
+        r'(?:me llamo|soy|mi nombre es)\s+([A-ZÁÉÍÓÚÑ][a-záéíóúñ]+(?:\s+[A-ZÁÉÍÓÚÑ][a-záéíóúñ]+)+)',
+        r'(?:nombre[:\s]+)([A-ZÁÉÍÓÚÑ][a-záéíóúñ]+(?:\s+[A-ZÁÉÍÓÚÑ][a-záéíóúñ]+)+)',
+    ]
+    for pattern in nombre_patterns:
+        match = re.search(pattern, texto, re.IGNORECASE)
+        if match:
+            nombre = match.group(1).strip()
+            break
 
-    if all([tiene_producto, tiene_talla, tiene_email, tiene_direccion, tiene_nombre]):
-        email_match = re.search(r'[\w.+-]+@[\w-]+\.[a-z]{2,}', texto)
-        return {
-            "tiene_datos": True,
-            "email": email_match.group(0) if email_match else ""
-        }
-    return None
+    if nombre == "Cliente ThreadCo":
+        for msg in historial:
+            if msg["role"] == "user":
+                match = re.search(
+                    r'^([A-ZÁÉÍÓÚÑ][a-záéíóúñ]+(?:\s+[A-ZÁÉÍÓÚÑ][a-záéíóúñ]+)+)$',
+                    msg["content"].strip()
+                )
+                if match:
+                    nombre = match.group(1)
+                    break
+
+    # Extraer dirección
+    direccion = "Ver conversación"
+    dir_patterns = [
+        r'(?:calle|avenida|av\.|plaza|pza\.|camino|carretera|ctra\.)\s+[^,\n.]+(?:,\s*\w+)?',
+    ]
+    for pattern in dir_patterns:
+        match = re.search(pattern, texto, re.IGNORECASE)
+        if match:
+            direccion = match.group(0).strip()
+            break
+
+    # Extraer producto y talla
+    productos_map = {
+        "camiseta blanca": ("Camiseta básica blanca", 1500),
+        "camiseta negra": ("Camiseta básica negra", 1500),
+        "sudadera": ("Sudadera gris con capucha", 3500),
+        "vaqueros": ("Vaqueros slim fit azul", 4500),
+        "chaqueta bomber": ("Chaqueta bomber negra", 7500),
+        "shorts cargo": ("Shorts cargo beige", 3000),
+    }
+
+    producto_nombre = "Producto"
+    precio_cents = 0
+    for key, (nombre_prod, precio) in productos_map.items():
+        if key in texto.lower():
+            producto_nombre = nombre_prod
+            precio_cents = precio
+            break
+
+    talla = "M"
+    for t in ["XL", "28", "30", "32", "34", "S", "M", "L"]:
+        if f"talla {t}".lower() in texto.lower() or f" {t} " in texto:
+            talla = t
+            break
+
+    return {
+        "tiene_datos": True,
+        "email": email_match.group(0),
+        "nombre": nombre,
+        "direccion": direccion,
+        "producto": producto_nombre,
+        "talla": talla,
+        "precio_cents": precio_cents
+    }
+
+
+def cancelar_pedido_por_id(pedido_id: int) -> dict:
+    from app.services.database import SessionLocal
+    from app.models.db_models import Pedido, LineaPedido, Producto
+
+    db = SessionLocal()
+    try:
+        pedido = db.query(Pedido).filter(Pedido.id == pedido_id).first()
+        if not pedido:
+            return {"ok": False, "mensaje": "No encontré ningún pedido con ese número."}
+
+        if pedido.estado in ["enviado", "entregado"]:
+            return {"ok": False, "mensaje": f"Lo sentimos, el pedido #{pedido_id} ya está {pedido.estado} y no puede cancelarse."}
+
+        if pedido.estado == "cancelado":
+            return {"ok": False, "mensaje": f"El pedido #{pedido_id} ya estaba cancelado."}
+
+        # Devolver stock
+        lineas = db.query(LineaPedido).filter(LineaPedido.pedido_id == pedido_id).all()
+        for linea in lineas:
+            producto = db.query(Producto).filter(Producto.id == linea.producto_id).first()
+            if producto:
+                producto.stock += linea.cantidad
+
+        pedido.estado = "cancelado"
+        db.commit()
+
+        return {"ok": True, "mensaje": f"Tu pedido #{pedido_id} ha sido cancelado correctamente. Si tienes alguna duda, no dudes en contactarnos."}
+    finally:
+        db.close()
+
 
 def chat_with_bot(session_id: str, user_message: str) -> str:
     try:
         history = get_or_create_session(session_id)
         append_message(session_id, "user", user_message)
+
+        # Detectar cancelación de pedido
+        cancelar_match = re.search(r'cancelar?\s+(?:el\s+)?(?:pedido\s+)?#?(\d+)',
+                                    user_message.lower())
+        if cancelar_match or "cancelar pedido" in user_message.lower():
+            if cancelar_match:
+                pedido_id = int(cancelar_match.group(1))
+                resultado = cancelar_pedido_por_id(pedido_id)
+                reply = resultado["mensaje"]
+            else:
+                reply = "Para cancelar tu pedido necesito el número de pedido que recibiste en el email de confirmación. ¿Cuál es el número de pedido?"
+            append_message(session_id, "assistant", reply)
+            return reply
 
         # Detectar confirmación de pedido
         if user_message.strip().upper() == "CONFIRMAR":
@@ -44,10 +140,14 @@ def chat_with_bot(session_id: str, user_message: str) -> str:
                 try:
                     pedido = crear_pedido(
                         session_id=session_id,
-                        nombre_cliente="Cliente ThreadCo",
+                        nombre_cliente=datos["nombre"],
                         email_cliente=datos["email"],
-                        direccion="Ver conversación",
-                        items=[{"nombre_producto": "Producto", "talla": "", "cantidad": 1}]
+                        direccion=datos["direccion"],
+                        items=[{
+                            "nombre_producto": datos["producto"],
+                            "talla": datos["talla"],
+                            "cantidad": 1
+                        }]
                     )
 
                     # Notificar a n8n

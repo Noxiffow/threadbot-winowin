@@ -1,3 +1,4 @@
+from fastapi import HTTPException
 from app.services.database import SessionLocal
 from app.models.db_models import Pedido, LineaPedido, Producto
 
@@ -25,6 +26,14 @@ def crear_pedido(
             ).first()
 
             if producto:
+                # Verificar stock suficiente
+                if producto.stock <= 0:
+                    raise HTTPException(
+                        status_code=400,
+                        detail=f"No hay stock disponible para {producto.nombre}"
+                    )
+                # Descontar stock
+                producto.stock -= item.get("cantidad", 1)
                 linea = LineaPedido(
                     producto_id=producto.id,
                     cantidad=item.get("cantidad", 1),
