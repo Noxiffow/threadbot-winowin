@@ -112,6 +112,20 @@ def cancelar_pedido_por_id(pedido_id: int, email_verificacion: str) -> dict:
         pedido.estado = "cancelado"
         db.commit()
 
+        try:
+            webhook_url = "http://localhost:5678/webhook/order-status"
+            payload = {
+                "pedido_id": pedido.id,
+                "nombre_cliente": pedido.nombre_cliente,
+                "email_cliente": pedido.email_cliente,
+                "estado": "cancelado",
+                "mensaje": "Tu pedido ha sido cancelado correctamente. Si tienes alguna duda, no dudes en contactarnos."
+            }
+            httpx.post(webhook_url, json=payload, timeout=5)
+        except Exception as e:
+            print(f"Error webhook cancelacion: {e}")
+            pass
+
         return {"ok": True, "mensaje": f"Tu pedido #{pedido_id} ha sido cancelado correctamente."}
     finally:
         db.close()
@@ -125,11 +139,7 @@ def chat_with_bot(session_id: str, user_message: str) -> str:
         history = get_or_create_session(session_id)
         append_message(session_id, "user", user_message)
 
-        # Detectar cancelación de pedido
-        cancelar_match = re.search(r'cancelar?\s+(?:el\s+)?(?:pedido\s+)?#?(\d+)',
-                                    user_message.lower())
-
-        # Verificar si hay una cancelación pendiente de email
+        # Paso 1: Si hay cancelación pendiente, el mensaje actual ES el email
         if session_id in cancelaciones_pendientes:
             pedido_id = cancelaciones_pendientes[session_id]["pedido_id"]
             del cancelaciones_pendientes[session_id]
@@ -138,13 +148,20 @@ def chat_with_bot(session_id: str, user_message: str) -> str:
             append_message(session_id, "assistant", reply)
             return reply
 
+        # Paso 2: Detectar nueva solicitud de cancelación
+        cancelar_match = re.search(r'cancelar?\s+(?:el\s+)?(?:pedido\s+)?#?(\d+)',
+                                    user_message.lower())
+        if not cancelar_match:
+            cancelar_match = re.search(r'(?:pedido\s+(?:es\s+el\s+|numero\s+|número\s+|el\s+)?#?)(\d+)',
+                                    user_message.lower())
+
         if cancelar_match or "cancelar pedido" in user_message.lower():
             if cancelar_match:
                 pedido_id = int(cancelar_match.group(1))
                 cancelaciones_pendientes[session_id] = {"pedido_id": pedido_id}
                 reply = f"Para verificar tu identidad, por favor indícame el email con el que realizaste el pedido #{pedido_id}."
             else:
-                reply = "Para cancelar tu pedido necesito el número de pedido que recibiste en el email de confirmación. ¿Cuál es el número de pedido?"
+                reply = "Para cancelar tu pedido necesito el número de pedido. ¿Cuál es?"
             append_message(session_id, "assistant", reply)
             return reply
 
