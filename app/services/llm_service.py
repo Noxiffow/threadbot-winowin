@@ -84,7 +84,7 @@ def extraer_datos_pedido(historial: list) -> dict | None:
     }
 
 
-def cancelar_pedido_por_id(pedido_id: int) -> dict:
+def cancelar_pedido_por_id(pedido_id: int, email_verificacion: str) -> dict:
     from app.services.database import SessionLocal
     from app.models.db_models import Pedido, LineaPedido, Producto
 
@@ -94,13 +94,15 @@ def cancelar_pedido_por_id(pedido_id: int) -> dict:
         if not pedido:
             return {"ok": False, "mensaje": "No encontré ningún pedido con ese número."}
 
+        if pedido.email_cliente.lower().strip() != email_verificacion.lower().strip():
+            return {"ok": False, "mensaje": "El email no coincide con el registrado para ese pedido. No es posible cancelarlo."}
+
         if pedido.estado in ["enviado", "entregado"]:
             return {"ok": False, "mensaje": f"Lo sentimos, el pedido #{pedido_id} ya está {pedido.estado} y no puede cancelarse."}
 
         if pedido.estado == "cancelado":
             return {"ok": False, "mensaje": f"El pedido #{pedido_id} ya estaba cancelado."}
 
-        # Devolver stock
         lineas = db.query(LineaPedido).filter(LineaPedido.pedido_id == pedido_id).all()
         for linea in lineas:
             producto = db.query(Producto).filter(Producto.id == linea.producto_id).first()
@@ -110,9 +112,12 @@ def cancelar_pedido_por_id(pedido_id: int) -> dict:
         pedido.estado = "cancelado"
         db.commit()
 
-        return {"ok": True, "mensaje": f"Tu pedido #{pedido_id} ha sido cancelado correctamente. Si tienes alguna duda, no dudes en contactarnos."}
+        return {"ok": True, "mensaje": f"Tu pedido #{pedido_id} ha sido cancelado correctamente."}
     finally:
         db.close()
+
+
+cancelaciones_pendientes: dict[str, dict] = {}
 
 
 def chat_with_bot(session_id: str, user_message: str) -> str:
@@ -123,11 +128,21 @@ def chat_with_bot(session_id: str, user_message: str) -> str:
         # Detectar cancelación de pedido
         cancelar_match = re.search(r'cancelar?\s+(?:el\s+)?(?:pedido\s+)?#?(\d+)',
                                     user_message.lower())
+
+        # Verificar si hay una cancelación pendiente de email
+        if session_id in cancelaciones_pendientes:
+            pedido_id = cancelaciones_pendientes[session_id]["pedido_id"]
+            del cancelaciones_pendientes[session_id]
+            resultado = cancelar_pedido_por_id(pedido_id, user_message.strip())
+            reply = resultado["mensaje"]
+            append_message(session_id, "assistant", reply)
+            return reply
+
         if cancelar_match or "cancelar pedido" in user_message.lower():
             if cancelar_match:
                 pedido_id = int(cancelar_match.group(1))
-                resultado = cancelar_pedido_por_id(pedido_id)
-                reply = resultado["mensaje"]
+                cancelaciones_pendientes[session_id] = {"pedido_id": pedido_id}
+                reply = f"Para verificar tu identidad, por favor indícame el email con el que realizaste el pedido #{pedido_id}."
             else:
                 reply = "Para cancelar tu pedido necesito el número de pedido que recibiste en el email de confirmación. ¿Cuál es el número de pedido?"
             append_message(session_id, "assistant", reply)
