@@ -113,7 +113,7 @@ def cancelar_pedido_por_id(pedido_id: int, email_verificacion: str) -> dict:
         db.commit()
 
         try:
-            webhook_url = "http://localhost:5678/webhook/order-status"
+            webhook_url = "https://n8n-production-6d70.up.railway.app/webhook/order-status"
             payload = {
                 "pedido_id": pedido.id,
                 "nombre_cliente": pedido.nombre_cliente,
@@ -185,7 +185,7 @@ def chat_with_bot(session_id: str, user_message: str) -> str:
                     # Notificar a n8n
                     try:
                         httpx.post(
-                            "http://localhost:5678/webhook/order-confirmed",
+                            "https://n8n-production-6d70.up.railway.app/webhook/order-confirmed",
                             json={
                                 "pedido_id": pedido.id,
                                 "estado": "confirmado",

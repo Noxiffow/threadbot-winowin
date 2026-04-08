@@ -105,7 +105,7 @@ def solicitar_factura(session_id: str, pedido_id: int, api_key: str = ""):
         db.add(solicitud)
         db.commit()
         try:
-            webhook_url = "http://localhost:5678/webhook-test/invoice-request"
+            webhook_url = "https://n8n-production-6d70.up.railway.app/webhook-test/invoice-request"
             payload = {
                 "pedido_id": pedido.id,
                 "nombre_cliente": pedido.nombre_cliente,
@@ -143,7 +143,7 @@ def actualizar_estado_pedido(pedido_id: int, estado: str, api_key: str = ""):
             "pendiente": "Tu pedido está pendiente de confirmación."
         }
         try:
-            webhook_url = "http://localhost:5678/webhook-test/order-status"
+            webhook_url = "https://n8n-production-6d70.up.railway.app/webhook-test/order-status"
             payload = {
                 "pedido_id": pedido.id,
                 "nombre_cliente": pedido.nombre_cliente,
@@ -195,7 +195,7 @@ def confirmar_pedido(pedido_id: int, api_key: str = ""):
 
         # Notificar a n8n
         try:
-            webhook_url = "http://localhost:5678/webhook/order-confirmed"
+            webhook_url = "https://n8n-production-6d70.up.railway.app/webhook/order-confirmed"
             payload = {
                 "pedido_id": pedido.id,
                 "estado": pedido.estado,
