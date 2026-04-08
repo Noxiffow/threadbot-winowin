@@ -41,7 +41,7 @@ def extraer_datos_pedido(historial: list) -> dict | None:
     # Extraer dirección
     direccion = "Ver conversación"
     dir_patterns = [
-        r'(?:calle|avenida|av\.|plaza|pza\.|camino|carretera|ctra\.)\s+[^,\n.]+(?:,\s*\w+)?',
+        r'(?:calle|avenida|av\.|plaza|pza\.|camino|carretera|ctra\.)[^\n]{5,150}',
     ]
     for pattern in dir_patterns:
         match = re.search(pattern, texto, re.IGNORECASE)
