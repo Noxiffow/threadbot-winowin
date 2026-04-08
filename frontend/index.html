@@ -357,7 +357,15 @@
 
     const bubble = document.createElement("div");
     bubble.className = "bubble";
-    bubble.innerHTML = text.replace(/\n/g, '<br>');
+    function renderMarkdown(text) {
+      return text
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.*?)\*/g, '<em>$1</em>')
+        .replace(/\n/g, '<br>')
+        .replace(/^\d+\.\s/gm, '<br>• ')
+        .replace(/^[-•]\s/gm, '<br>• ');
+    }
+    bubble.innerHTML = renderMarkdown(text);
 
     const time = document.createElement("div");
     time.className = "msg-time";
