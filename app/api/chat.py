@@ -194,7 +194,7 @@ def listar_pedidos_admin(api_key: str = ""):
                 "email_cliente": p.email_cliente,
                 "estado": p.estado,
                 "total": p.total_cents / 100,
-                "fecha": str(p.fecha)
+                "fecha": str(p.fecha_creacion)
             }
             for p in pedidos
         ]
