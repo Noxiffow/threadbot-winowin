@@ -40,14 +40,13 @@ def extraer_datos_pedido(historial: list) -> dict | None:
 
     # Extraer dirección
     direccion = "Ver conversación"
-    dir_patterns = [
-        r'(?:calle|avenida|av\.|plaza|pza\.|camino|carretera|ctra\.)[^\n]{5,150}',
-    ]
-    for pattern in dir_patterns:
-        match = re.search(pattern, texto, re.IGNORECASE)
-        if match:
-            direccion = match.group(0).strip()
-            break
+    # Buscar mensajes del usuario que parezcan direcciones
+    for msg in historial:
+        if msg["role"] == "user":
+            txt = msg["content"].strip()
+            if re.search(r'(?:calle|avenida|av\.|plaza|camino|carretera)', txt, re.IGNORECASE):
+                direccion = txt
+                break
 
     # Extraer producto y talla
     productos_map = {
