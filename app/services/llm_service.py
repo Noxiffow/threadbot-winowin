@@ -17,26 +17,12 @@ def extraer_datos_pedido(historial: list) -> dict | None:
 
     # Extraer nombre
     nombre = "Cliente ThreadCo"
-    nombre_patterns = [
-        r'(?:me llamo|soy|mi nombre es)\s+([A-ZÁÉÍÓÚÑ][a-záéíóúñ]+(?:\s+[A-ZÁÉÍÓÚÑ][a-záéíóúñ]+)+)',
-        r'(?:nombre[:\s]+)([A-ZÁÉÍÓÚÑ][a-záéíóúñ]+(?:\s+[A-ZÁÉÍÓÚÑ][a-záéíóúñ]+)+)',
-    ]
-    for pattern in nombre_patterns:
-        match = re.search(pattern, texto, re.IGNORECASE)
-        if match:
-            nombre = match.group(1).strip()
-            break
-
-    if nombre == "Cliente ThreadCo":
-        for msg in historial:
-            if msg["role"] == "user":
-                match = re.search(
-                    r'^([A-ZÁÉÍÓÚÑ][a-záéíóúñ]+(?:\s+[A-ZÁÉÍÓÚÑ][a-záéíóúñ]+)+)$',
-                    msg["content"].strip()
-                )
-                if match:
-                    nombre = match.group(1)
-                    break
+    for msg in historial:
+        if msg["role"] == "user":
+            txt = msg["content"].strip()
+            if re.match(r'^[A-ZÁÉÍÓÚÑ][a-záéíóúñ]+(\s+[A-ZÁÉÍÓÚÑ][a-záéíóúñ]+)+$', txt):
+                nombre = txt
+                break
 
     # Extraer dirección
     direccion = "Ver conversación"
