@@ -45,8 +45,9 @@ def extraer_datos_pedido(historial: list) -> dict | None:
         if msg["role"] == "user":
             txt = msg["content"].strip()
             if re.search(r'(?:calle|avenida|av\.|plaza|camino|carretera)', txt, re.IGNORECASE):
-                direccion = txt
-                break
+                if len(txt) < 150:
+                    direccion = txt
+                    break
 
     # Extraer producto y talla
     productos_map = {
