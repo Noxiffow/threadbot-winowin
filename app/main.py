@@ -20,5 +20,119 @@ app.mount("/static", StaticFiles(directory="frontend"), name="static")
 def serve_frontend():
     return FileResponse("frontend/index.html")
 
+@app.get("/admin")
+def admin_panel():
+    html = """<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ThreadBot Admin</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #0f0f0f; color: #ffffff; font-family: 'Helvetica Neue', Arial, sans-serif; }
+  header { background: #1a1a1a; border-bottom: 3px solid #c9a84c; padding: 20px 40px; display: flex; align-items: center; gap: 16px; }
+  header h1 { font-size: 22px; color: #c9a84c; letter-spacing: 3px; }
+  header span { font-size: 12px; color: #888; letter-spacing: 1px; }
+  .container { padding: 32px 40px; max-width: 1200px; margin: 0 auto; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; margin-bottom: 40px; }
+  .card { background: #1a1a1a; border: 1px solid #2a2a2a; border-top: 3px solid #c9a84c; padding: 20px; border-radius: 4px; }
+  .card .num { font-size: 36px; font-weight: bold; color: #c9a84c; }
+  .card .label { font-size: 12px; color: #888; letter-spacing: 1px; margin-top: 4px; }
+  h2 { font-size: 14px; color: #c9a84c; letter-spacing: 2px; margin-bottom: 16px; border-bottom: 1px solid #2a2a2a; padding-bottom: 8px; }
+  table { width: 100%; border-collapse: collapse; margin-bottom: 40px; }
+  th { background: #252525; padding: 12px 16px; text-align: left; font-size: 11px; color: #c9a84c; letter-spacing: 1px; border-bottom: 1px solid #333; }
+  td { padding: 12px 16px; font-size: 13px; color: #cccccc; border-bottom: 1px solid #222; }
+  tr:hover td { background: #1e1e1e; }
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: bold; }
+  .badge.pendiente { background: #2a2a00; color: #ffcc00; }
+  .badge.confirmado { background: #002a1a; color: #00cc88; }
+  .badge.enviado { background: #002233; color: #00aaff; }
+  .badge.entregado { background: #1a2a00; color: #88cc00; }
+  .badge.cancelado { background: #2a0000; color: #ff4444; }
+  .stock-bar { background: #252525; border-radius: 4px; height: 6px; margin-top: 6px; }
+  .stock-bar-fill { height: 6px; border-radius: 4px; background: #c9a84c; }
+  .stock-low .stock-bar-fill { background: #ff4444; }
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>THREADBOT ADMIN</h1>
+    <span>PANEL DE ADMINISTRACIÓN · THREADCO</span>
+  </div>
+</header>
+<div class="container">
+  <div class="grid" id="stats"></div>
+  <h2>STOCK ACTUAL</h2>
+  <table id="stock-table">
+    <thead><tr><th>PRODUCTO</th><th>CATEGORÍA</th><th>PRECIO</th><th>TALLAS</th><th>STOCK</th></tr></thead>
+    <tbody id="stock-body"></tbody>
+  </table>
+  <h2>ÚLTIMOS PEDIDOS</h2>
+  <table id="orders-table">
+    <thead><tr><th>ID</th><th>CLIENTE</th><th>EMAIL</th><th>TOTAL</th><th>ESTADO</th><th>FECHA</th></tr></thead>
+    <tbody id="orders-body"></tbody>
+  </table>
+</div>
+<script>
+async function load() {
+  const [products, orders] = await Promise.all([
+    fetch('/products').then(r => r.json()),
+    fetch('/orders-admin?api_key=threadbot-internal-key').then(r => r.json())
+  ]);
+
+  // Stats
+  const stats = [
+    { num: products.length, label: 'PRODUCTOS' },
+    { num: orders.filter(o => o.estado === 'pendiente').length, label: 'PENDIENTES' },
+    { num: orders.filter(o => o.estado === 'confirmado').length, label: 'CONFIRMADOS' },
+    { num: orders.filter(o => o.estado === 'enviado').length, label: 'ENVIADOS' },
+    { num: orders.filter(o => o.estado === 'entregado').length, label: 'ENTREGADOS' },
+    { num: orders.filter(o => o.estado === 'cancelado').length, label: 'CANCELADOS' },
+  ];
+  document.getElementById('stats').innerHTML = stats.map(s =>
+    `<div class="card"><div class="num">${s.num}</div><div class="label">${s.label}</div></div>`
+  ).join('');
+
+  // Stock
+  const maxStock = Math.max(...products.map(p => p.stock), 1);
+  document.getElementById('stock-body').innerHTML = products.map(p => {
+    const pct = Math.round((p.stock / maxStock) * 100);
+    const low = p.stock <= 5;
+    return `<tr>
+      <td><strong>${p.nombre}</strong></td>
+      <td style="color:#888">${p.categoria}</td>
+      <td style="color:#c9a84c">${p.precio}€</td>
+      <td style="color:#888">${p.tallas}</td>
+      <td>
+        <span style="color:${low ? '#ff4444' : '#ffffff'}">${p.stock} uds</span>
+        <div class="stock-bar ${low ? 'stock-low' : ''}">
+          <div class="stock-bar-fill" style="width:${pct}%"></div>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+
+  // Orders
+  document.getElementById('orders-body').innerHTML = orders.map(o =>
+    `<tr>
+      <td style="color:#c9a84c">#${o.id}</td>
+      <td>${o.nombre_cliente}</td>
+      <td style="color:#888;font-size:12px">${o.email_cliente}</td>
+      <td style="color:#c9a84c">${o.total}€</td>
+      <td><span class="badge ${o.estado}">${o.estado}</span></td>
+      <td style="color:#888;font-size:12px">${o.fecha.split('.')[0]}</td>
+    </tr>`
+  ).join('');
+}
+load();
+setInterval(load, 30000);
+</script>
+</body>
+</html>"""
+    from fastapi.responses import HTMLResponse
+    return HTMLResponse(content=html)
+
 app.include_router(health.router)
 app.include_router(chat.router)

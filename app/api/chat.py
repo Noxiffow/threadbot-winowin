@@ -180,6 +180,27 @@ def listar_productos():
     finally:
         db.close()
 
+@router.get("/orders-admin")
+def listar_pedidos_admin(api_key: str = ""):
+    if api_key != "threadbot-internal-key":
+        raise HTTPException(status_code=401, detail="No autorizado")
+    db = SessionLocal()
+    try:
+        pedidos = db.query(Pedido).order_by(Pedido.id.desc()).limit(50).all()
+        return [
+            {
+                "id": p.id,
+                "nombre_cliente": p.nombre_cliente,
+                "email_cliente": p.email_cliente,
+                "estado": p.estado,
+                "total": p.total_cents / 100,
+                "fecha": str(p.fecha)
+            }
+            for p in pedidos
+        ]
+    finally:
+        db.close()
+
 @router.post("/orders/{pedido_id}/confirm")
 def confirmar_pedido(pedido_id: int, api_key: str = ""):
     if api_key != "threadbot-internal-key":
