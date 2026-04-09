@@ -135,6 +135,13 @@ def chat_with_bot(session_id: str, user_message: str) -> str:
             return reply
 
         # Paso 2: Detectar nueva solicitud de cancelación
+        # Detectar intención de cancelar sin número
+        if any(word in user_message.lower() for word in ['cancelar', 'cancelación', 'anular', 'deseo cancelar', 'quiero cancelar']):
+            if not re.search(r'\d+', user_message):
+                reply = "¿Cuál es el número de pedido que quieres cancelar? Lo encontrarás en el email de confirmación."
+                append_message(session_id, "assistant", reply)
+                return reply
+
         cancelar_match = re.search(r'cancelar?\s+(?:el\s+)?(?:pedido\s+)?#?(\d+)',
                                     user_message.lower())
         if not cancelar_match:
