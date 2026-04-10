@@ -33,7 +33,13 @@ def extraer_datos_pedido(historial: list) -> dict | None:
                 break
             # Mensaje que es solo un nombre (2-5 palabras, primera capitalizada)
             palabras = txt.split()
-            if 2 <= len(palabras) <= 5 and palabras[0][0].isupper() and len(txt) < 60:
+            palabras_excluidas = ['cancelar', 'confirmar', 'factura', 'pedido',
+                                   'quiero', 'necesito', 'gracias', 'hola',
+                                   'adiós', 'por', 'favor', 'sí', 'no']
+            if (2 <= len(palabras) <= 5 and
+                palabras[0][0].isupper() and
+                len(txt) < 60 and
+                not any(p in txt.lower() for p in palabras_excluidas)):
                 nombre = txt
                 break
 
