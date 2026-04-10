@@ -57,11 +57,15 @@ def extraer_datos_pedido(historial: list) -> dict | None:
     # Extraer producto y talla
     productos_map = {
         "camiseta blanca": ("Camiseta básica blanca", 1500),
+        "camiseta básica blanca": ("Camiseta básica blanca", 1500),
         "camiseta negra": ("Camiseta básica negra", 1500),
+        "camiseta básica negra": ("Camiseta básica negra", 1500),
         "sudadera": ("Sudadera gris con capucha", 3500),
         "vaqueros": ("Vaqueros slim fit azul", 4500),
         "chaqueta bomber": ("Chaqueta bomber negra", 7500),
+        "chaqueta": ("Chaqueta bomber negra", 7500),
         "shorts cargo": ("Shorts cargo beige", 3000),
+        "shorts": ("Shorts cargo beige", 3000),
     }
 
     producto_nombre = "Producto"
