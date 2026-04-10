@@ -206,6 +206,16 @@ def chat_with_bot(session_id: str, user_message: str) -> str:
                         }]
                     )
 
+                    # Confirmar el pedido automáticamente
+                    try:
+                        httpx.post(
+                            f"https://threadbot-winowin-production.up.railway.app/orders/{pedido.id}/confirm",
+                            params={"api_key": "threadbot-internal-key"},
+                            timeout=5
+                        )
+                    except Exception:
+                        pass
+
                     # Notificar a n8n
                     try:
                         httpx.post(
