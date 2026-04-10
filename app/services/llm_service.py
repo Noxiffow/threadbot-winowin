@@ -17,10 +17,23 @@ def extraer_datos_pedido(historial: list) -> dict | None:
 
     # Extraer nombre
     nombre = "Cliente ThreadCo"
+    nombre_patterns = [
+        r'(?:me llamo|soy|mi nombre es|nombre[:\s]+)\s*([A-ZÁÉÍÓÚÑ][a-záéíóúñ]+(?:\s+(?:de|da|dos|del|las|los|van|von)?\s*[A-ZÁÉÍÓÚÑ][a-záéíóúñ]+)+)',
+        r'(?:me llamo|soy|mi nombre es|nombre[:\s]+)\s*([A-ZÁÉÍÓÚÑ][^\n,\.]{2,50})',
+    ]
     for msg in historial:
         if msg["role"] == "user":
             txt = msg["content"].strip()
-            if re.match(r'^[A-ZÁÉÍÓÚÑ][a-záéíóúñ]+(\s+[A-ZÁÉÍÓÚÑ][a-záéíóúñ]+)+$', txt):
+            for pattern in nombre_patterns:
+                match = re.search(pattern, txt, re.IGNORECASE)
+                if match:
+                    nombre = match.group(1).strip()
+                    break
+            if nombre != "Cliente ThreadCo":
+                break
+            # Mensaje que es solo un nombre (2-5 palabras, primera capitalizada)
+            palabras = txt.split()
+            if 2 <= len(palabras) <= 5 and palabras[0][0].isupper() and len(txt) < 60:
                 nombre = txt
                 break
 
