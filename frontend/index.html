@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ThreadBot — ThreadCo</title>
+  <title>ThreadBot</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=Playfair+Display:wght@600&display=swap" rel="stylesheet" />
@@ -298,7 +298,7 @@
     <div class="avatar">TB</div>
     <div class="header-text">
       <div class="bot-name">ThreadBot</div>
-      <div class="bot-sub">ThreadCo · Asistente virtual</div>
+      <div class="bot-sub"><span class="nombre-tienda">ThreadCo</span> · Asistente virtual</div>
     </div>
     <div class="status-dot"></div>
   </div>
@@ -334,6 +334,17 @@
 </div>
 
 <script>
+  async function cargarConfig() {
+    const res = await fetch('/config?api_key=threadbot-internal-key');
+    const config = await res.json();
+    const nombre = config.nombre_tienda?.valor || 'ThreadCo';
+
+    // Actualizar todos los elementos que muestran el nombre
+    document.querySelectorAll('.nombre-tienda').forEach(el => el.textContent = nombre);
+    document.title = `ThreadBot — ${nombre}`;
+    return nombre;
+  }
+
   const SESSION_ID = crypto.randomUUID();
   const API_URL    = "https://threadbot-winowin-production.up.railway.app/chat";
 
@@ -451,8 +462,9 @@
   });
 
   /* ── Bienvenida ── */
-  window.addEventListener("load", () => {
-    appendMessage("bot", "¡Hola! Soy ThreadBot, el asistente de ThreadCo. ¿En qué puedo ayudarte hoy?");
+  window.addEventListener("load", async () => {
+    const nombreTienda = await cargarConfig();
+    appendMessage("bot", `¡Hola! Soy ThreadBot, el asistente de ${nombreTienda}. ¿En qué puedo ayudarte hoy?`);
   });
 </script>
 
