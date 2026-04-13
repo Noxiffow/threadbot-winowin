@@ -186,6 +186,23 @@ def listar_productos():
     finally:
         db.close()
 
+@router.post("/products/{producto_id}/stock")
+def actualizar_stock(producto_id: int, stock: int, api_key: str = ""):
+    if api_key != "threadbot-internal-key":
+        raise HTTPException(status_code=401, detail="No autorizado")
+    db = SessionLocal()
+    try:
+        producto = db.query(Producto).filter(Producto.id == producto_id).first()
+        if not producto:
+            raise HTTPException(status_code=404, detail="Producto no encontrado")
+        if stock < 0:
+            raise HTTPException(status_code=400, detail="El stock no puede ser negativo")
+        producto.stock = stock
+        db.commit()
+        return {"ok": True, "producto_id": producto_id, "stock": stock}
+    finally:
+        db.close()
+
 @router.get("/orders-admin")
 def listar_pedidos_admin(api_key: str = ""):
     if api_key != "threadbot-internal-key":

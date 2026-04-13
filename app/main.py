@@ -95,6 +95,17 @@ async function guardarConfig(clave, valorForzado) {
   }
 }
 
+async function actualizarStock(productoId) {
+  const stock = parseInt(document.getElementById('stock_' + productoId).value);
+  const res = await fetch('/products/' + productoId + '/stock?api_key=threadbot-internal-key&stock=' + stock, {method: 'POST'});
+  const data = await res.json();
+  if (data.ok) {
+    load(); // refresca el panel
+  } else {
+    alert('❌ Error al actualizar stock');
+  }
+}
+
 async function load() {
   const [products, orders] = await Promise.all([
     fetch('/products').then(r => r.json()),
@@ -125,8 +136,15 @@ async function load() {
       <td style="color:#c9a84c">${p.precio}€</td>
       <td style="color:#888">${p.tallas}</td>
       <td>
-        <span style="color:${low ? '#ff4444' : '#ffffff'}">${p.stock} uds</span>
-        <div class="stock-bar ${low ? 'stock-low' : ''}">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <input type="number" id="stock_${p.id}" value="${p.stock}" min="0"
+            style="width:70px;background:#252525;border:1px solid #333;color:${p.stock<=5?'#ff4444':'#fff'};padding:4px 8px;border-radius:4px;font-size:13px;">
+          <button onclick="actualizarStock(${p.id})"
+            style="background:#c9a84c;color:#000;border:none;padding:4px 10px;border-radius:4px;font-size:11px;font-weight:bold;cursor:pointer;">
+            ✓
+          </button>
+        </div>
+        <div class="stock-bar ${p.stock<=5?'stock-low':''}">
           <div class="stock-bar-fill" style="width:${pct}%"></div>
         </div>
       </td>
