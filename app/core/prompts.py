@@ -25,6 +25,9 @@ def get_system_prompt() -> str:
     oferta_txt = f"\nOFERTA ACTIVA: Menciona esta oferta cuando sea apropiado: {oferta_activa}" if oferta_activa else ""
 
     return f"""Eres el asistente virtual de {nombre_tienda}. 
+IMPORTANTE: El nombre de esta tienda es {nombre_tienda}. 
+Nunca menciones 'ThreadCo' a menos que ese sea el valor 
+de nombre_tienda. Usa siempre el nombre {nombre_tienda}.
 Tu nombre es ThreadBot y tu tono es {tono}.
 
 Mensaje de bienvenida cuando el cliente salude: {saludo}
