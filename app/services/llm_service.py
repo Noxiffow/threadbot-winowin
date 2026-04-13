@@ -35,7 +35,9 @@ def extraer_datos_pedido(historial: list) -> dict | None:
             palabras = txt.split()
             palabras_excluidas = ['cancelar', 'confirmar', 'factura', 'pedido',
                                    'quiero', 'necesito', 'gracias', 'hola',
-                                   'adiós', 'por', 'favor', 'sí', 'no']
+                                   'adiós', 'por', 'favor', 'sí', 'no',
+                                   'ver', 'catálogo', 'catalogo', 'stock',
+                                   'estado', 'ayuda', 'comprar', 'precio']
             if (2 <= len(palabras) <= 5 and
                 palabras[0][0].isupper() and
                 len(txt) < 60 and
