@@ -1,26 +1,32 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Request
 from app.schemas.chat_schemas import ChatIn, ChatOut
 from app.services.llm_service import chat_with_bot
 from app.services.orders import get_pedido
 from app.models.db_models import Alerta, Configuracion, Pedido, Producto, SolicitudFactura
 from app.services.database import SessionLocal
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 import httpx
 
 router = APIRouter()
+limiter = Limiter(key_func=get_remote_address)
 
 @router.post("/chat", response_model=ChatOut)
-def chat(body: ChatIn):
-    if not body.session_id.strip():
+@limiter.limit("20/minute")
+async def chat(request: Request, chat_in: ChatIn):
+    if not chat_in.session_id.strip():
         raise HTTPException(
             status_code=400,
             detail="El campo session_id no puede estar vacío"
         )
-    if not body.message.strip():
+    if not chat_in.message.strip():
         raise HTTPException(
             status_code=400,
             detail="El mensaje no puede estar vacío"
         )
-    reply = chat_with_bot(body.session_id, body.message)
+    if len(chat_in.message) > 500:
+        raise HTTPException(status_code=400, detail="Mensaje demasiado largo")
+    reply = chat_with_bot(chat_in.session_id, chat_in.message)
     return ChatOut(reply=reply)
 
 @router.get("/orders/{pedido_id}")
