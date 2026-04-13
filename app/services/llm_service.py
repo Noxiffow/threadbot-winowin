@@ -146,6 +146,20 @@ esperando_numero_pedido: dict[str, bool] = {}
 
 def chat_with_bot(session_id: str, user_message: str) -> str:
     try:
+        # Verificar si el bot está activo
+        try:
+            from app.services.database import SessionLocal
+            from app.models.db_models import Configuracion
+            db = SessionLocal()
+            config = db.query(Configuracion).filter(
+                Configuracion.clave == "bot_activo"
+            ).first()
+            db.close()
+            if config and config.valor.lower() == "false":
+                return "El asistente está temporalmente fuera de servicio. Por favor, inténtalo más tarde."
+        except Exception:
+            pass
+
         history = get_or_create_session(session_id)
         append_message(session_id, "user", user_message)
 
