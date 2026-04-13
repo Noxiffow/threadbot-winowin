@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException
 from app.schemas.chat_schemas import ChatIn, ChatOut
 from app.services.llm_service import chat_with_bot
 from app.services.orders import get_pedido
-from app.models.db_models import Alerta, Pedido, Producto, SolicitudFactura
+from app.models.db_models import Alerta, Configuracion, Pedido, Producto, SolicitudFactura
 from app.services.database import SessionLocal
 import httpx
 
@@ -238,5 +238,31 @@ def confirmar_pedido(pedido_id: int, api_key: str = ""):
             "direccion": pedido.direccion,
             "total": pedido.total_cents / 100
         }
+    finally:
+        db.close()
+
+@router.get("/config")
+def obtener_config(api_key: str = ""):
+    if api_key != "threadbot-internal-key":
+        raise HTTPException(status_code=401, detail="No autorizado")
+    db = SessionLocal()
+    try:
+        configs = db.query(Configuracion).all()
+        return {c.clave: {"valor": c.valor, "descripcion": c.descripcion} for c in configs}
+    finally:
+        db.close()
+
+@router.post("/config/{clave}")
+def actualizar_config(clave: str, valor: str, api_key: str = ""):
+    if api_key != "threadbot-internal-key":
+        raise HTTPException(status_code=401, detail="No autorizado")
+    db = SessionLocal()
+    try:
+        config = db.query(Configuracion).filter(Configuracion.clave == clave).first()
+        if not config:
+            raise HTTPException(status_code=404, detail="Configuración no encontrada")
+        config.valor = valor
+        db.commit()
+        return {"ok": True, "clave": clave, "valor": valor}
     finally:
         db.close()

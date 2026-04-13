@@ -65,3 +65,11 @@ class Alerta(Base):
     mensaje = Column(Text)
     enviada = Column(Boolean, default=False)
     fecha = Column(DateTime, default=datetime.utcnow)
+
+class Configuracion(Base):
+    __tablename__ = "configuracion"
+
+    id = Column(Integer, primary_key=True)
+    clave = Column(String(100), unique=True, nullable=False)
+    valor = Column(Text, nullable=False)
+    descripcion = Column(String(200))
