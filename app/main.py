@@ -74,8 +74,21 @@ def admin_panel():
     <thead><tr><th>ID</th><th>CLIENTE</th><th>EMAIL</th><th>TOTAL</th><th>ESTADO</th><th>FECHA</th></tr></thead>
     <tbody id="orders-body"></tbody>
   </table>
+  <h2>CONFIGURACIÓN DEL CHATBOT</h2>
+  <div id="config-section"></div>
 </div>
 <script>
+async function guardarConfig(clave) {
+  const valor = document.getElementById('input_' + clave).value;
+  const res = await fetch('/config/' + clave + '?api_key=threadbot-internal-key&valor=' + encodeURIComponent(valor), {method: 'POST'});
+  const data = await res.json();
+  if (data.ok) {
+    alert('✅ ' + clave + ' actualizado correctamente');
+  } else {
+    alert('❌ Error al guardar');
+  }
+}
+
 async function load() {
   const [products, orders] = await Promise.all([
     fetch('/products').then(r => r.json()),
@@ -125,6 +138,24 @@ async function load() {
       <td style="color:#888;font-size:12px">${o.fecha.split('.')[0]}</td>
     </tr>`
   ).join('');
+
+  // Cargar configuración
+  const config = await fetch('/config?api_key=threadbot-internal-key').then(r => r.json());
+
+  document.getElementById('config-section').innerHTML = Object.entries(config).map(([clave, data]) => `
+    <div style="background:#1e1e1e;border:1px solid #2a2a2a;border-radius:4px;padding:16px;margin-bottom:12px;">
+      <label style="display:block;font-size:11px;color:#c9a84c;font-weight:bold;letter-spacing:1px;margin-bottom:8px;">${clave.toUpperCase().replace(/_/g,' ')}</label>
+      <p style="font-size:11px;color:#666;margin-bottom:8px;">${data.descripcion}</p>
+      <div style="display:flex;gap:8px;">
+        <input id="input_${clave}" type="text" value="${data.valor}" 
+          style="flex:1;background:#252525;border:1px solid #333;color:#fff;padding:8px 12px;border-radius:4px;font-size:13px;outline:none;">
+        <button onclick="guardarConfig('${clave}')"
+          style="background:#c9a84c;color:#000;border:none;padding:8px 16px;border-radius:4px;font-size:12px;font-weight:bold;cursor:pointer;">
+          GUARDAR
+        </button>
+      </div>
+    </div>
+  `).join('');
 }
 load();
 setInterval(load, 30000);
