@@ -142,10 +142,14 @@ def cancelar_pedido_por_id(pedido_id: int, email_verificacion: str) -> dict:
 
 cancelaciones_pendientes: dict[str, dict] = {}
 esperando_numero_pedido: dict[str, bool] = {}
+sesiones_bloqueadas: set = set()
 
 
 def chat_with_bot(session_id: str, user_message: str) -> str:
     try:
+        if session_id in sesiones_bloqueadas:
+            return "El asistente está temporalmente fuera de servicio. Por favor, inténtalo más tarde."
+
         # Verificar si el bot está activo
         try:
             from app.services.database import SessionLocal
@@ -156,6 +160,7 @@ def chat_with_bot(session_id: str, user_message: str) -> str:
             ).first()
             db.close()
             if config and config.valor.lower() == "false":
+                sesiones_bloqueadas.add(session_id)
                 return "El asistente está temporalmente fuera de servicio. Por favor, inténtalo más tarde."
         except Exception:
             pass

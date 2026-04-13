@@ -78,8 +78,8 @@ def admin_panel():
   <div id="config-section"></div>
 </div>
 <script>
-async function guardarConfig(clave) {
-  const valor = document.getElementById('input_' + clave).value;
+async function guardarConfig(clave, valorForzado) {
+  const valor = valorForzado !== undefined ? valorForzado : document.getElementById('input_' + clave).value;
   const res = await fetch('/config/' + clave + '?api_key=threadbot-internal-key&valor=' + encodeURIComponent(valor), {method: 'POST'});
   const data = await res.json();
   if (data.ok) {
@@ -142,20 +142,40 @@ async function load() {
   // Cargar configuración
   const config = await fetch('/config?api_key=threadbot-internal-key').then(r => r.json());
 
-  document.getElementById('config-section').innerHTML = Object.entries(config).map(([clave, data]) => `
-    <div style="background:#1e1e1e;border:1px solid #2a2a2a;border-radius:4px;padding:16px;margin-bottom:12px;">
-      <label style="display:block;font-size:11px;color:#c9a84c;font-weight:bold;letter-spacing:1px;margin-bottom:8px;">${clave.toUpperCase().replace(/_/g,' ')}</label>
-      <p style="font-size:11px;color:#666;margin-bottom:8px;">${data.descripcion}</p>
-      <div style="display:flex;gap:8px;">
-        <input id="input_${clave}" type="text" value="${data.valor}" 
-          style="flex:1;background:#252525;border:1px solid #333;color:#fff;padding:8px 12px;border-radius:4px;font-size:13px;outline:none;">
-        <button onclick="guardarConfig('${clave}')"
-          style="background:#c9a84c;color:#000;border:none;padding:8px 16px;border-radius:4px;font-size:12px;font-weight:bold;cursor:pointer;">
-          GUARDAR
-        </button>
+  document.getElementById('config-section').innerHTML = Object.entries(config).map(([clave, data]) => {
+    if (clave === 'bot_activo') {
+      return `
+        <div style="background:#1e1e1e;border:1px solid #2a2a2a;border-radius:4px;padding:16px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;">
+          <div>
+            <label style="font-size:11px;color:#c9a84c;font-weight:bold;letter-spacing:1px;">BOT ACTIVO</label>
+            <p style="font-size:11px;color:#666;margin-top:4px;">${data.descripcion}</p>
+          </div>
+          <label style="position:relative;display:inline-block;width:52px;height:28px;">
+            <input type="checkbox" id="toggle_bot_activo" ${data.valor === 'true' ? 'checked' : ''} 
+              onchange="guardarConfig('bot_activo', this.checked ? 'true' : 'false')"
+              style="opacity:0;width:0;height:0;">
+            <span style="position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:${data.valor === 'true' ? '#c9a84c' : '#444'};border-radius:28px;transition:.3s;">
+              <span style="position:absolute;content:'';height:20px;width:20px;left:4px;bottom:4px;background:white;border-radius:50%;transition:.3s;transform:${data.valor === 'true' ? 'translateX(24px)' : 'translateX(0)'}"></span>
+            </span>
+          </label>
+        </div>
+      `;
+    }
+    return `
+      <div style="background:#1e1e1e;border:1px solid #2a2a2a;border-radius:4px;padding:16px;margin-bottom:12px;">
+        <label style="display:block;font-size:11px;color:#c9a84c;font-weight:bold;letter-spacing:1px;margin-bottom:8px;">${clave.toUpperCase().replace(/_/g,' ')}</label>
+        <p style="font-size:11px;color:#666;margin-bottom:8px;">${data.descripcion}</p>
+        <div style="display:flex;gap:8px;">
+          <input id="input_${clave}" type="text" value="${data.valor}" 
+            style="flex:1;background:#252525;border:1px solid #333;color:#fff;padding:8px 12px;border-radius:4px;font-size:13px;outline:none;">
+          <button onclick="guardarConfig('${clave}')"
+            style="background:#c9a84c;color:#000;border:none;padding:8px 16px;border-radius:4px;font-size:12px;font-weight:bold;cursor:pointer;">
+            GUARDAR
+          </button>
+        </div>
       </div>
-    </div>
-  `).join('');
+    `;
+  }).join('');
 }
 load();
 setInterval(load, 30000);

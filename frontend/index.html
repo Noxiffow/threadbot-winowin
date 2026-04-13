@@ -352,6 +352,22 @@
   const inputEl    = document.getElementById("msg-input");
   const sendBtn    = document.getElementById("send-btn");
   const chipsEl    = document.getElementById("chips");
+  const statusDotEl = document.querySelector(".status-dot");
+  let botActivo = true;
+
+  async function verificarEstadoBot() {
+    const res = await fetch('/config?api_key=threadbot-internal-key');
+    const config = await res.json();
+    botActivo = config.bot_activo?.valor !== 'false';
+
+    if (!botActivo) {
+      statusDotEl.style.background = '#ff4444';
+      statusDotEl.style.boxShadow = '0 0 6px rgba(255,68,68,0.6)';
+      inputEl.disabled = true;
+      sendBtn.disabled = true;
+      inputEl.placeholder = "Asistente temporalmente fuera de servicio";
+    }
+  }
 
   /* ── Utilidades ── */
   function timeNow() {
@@ -445,6 +461,10 @@
 
   /* ── Eventos ── */
   inputEl.addEventListener("input", () => {
+    if (!botActivo) {
+      sendBtn.disabled = true;
+      return;
+    }
     sendBtn.disabled = inputEl.value.trim() === "";
   });
 
@@ -464,6 +484,7 @@
   /* ── Bienvenida ── */
   window.addEventListener("load", async () => {
     const nombreTienda = await cargarConfig();
+    await verificarEstadoBot();
     appendMessage("bot", `¡Hola! Soy ThreadBot, el asistente de ${nombreTienda}. ¿En qué puedo ayudarte hoy?`);
   });
 </script>
