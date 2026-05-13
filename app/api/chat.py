@@ -4,6 +4,7 @@ from app.services.llm_service import chat_with_bot
 from app.services.orders import get_pedido
 from app.models.db_models import Alerta, Configuracion, Pedido, Producto, SolicitudFactura
 from app.services.database import SessionLocal
+from app.core.config import N8N_BASE_URL
 from slowapi import Limiter
 from slowapi.util import get_remote_address
 import httpx
@@ -111,7 +112,7 @@ def solicitar_factura(session_id: str, pedido_id: int, api_key: str = ""):
         db.add(solicitud)
         db.commit()
         try:
-            webhook_url = "https://n8n-production-6d70.up.railway.app/webhook-test/invoice-request"
+            webhook_url = f"{N8N_BASE_URL}/webhook/invoice-request"
             payload = {
                 "pedido_id": pedido.id,
                 "nombre_cliente": pedido.nombre_cliente,
@@ -149,7 +150,7 @@ def actualizar_estado_pedido(pedido_id: int, estado: str, api_key: str = ""):
             "pendiente": "Tu pedido está pendiente de confirmación."
         }
         try:
-            webhook_url = "https://n8n-production-6d70.up.railway.app/webhook-test/order-status"
+            webhook_url = f"{N8N_BASE_URL}/webhook/order-status"
             payload = {
                 "pedido_id": pedido.id,
                 "nombre_cliente": pedido.nombre_cliente,

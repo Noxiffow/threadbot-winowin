@@ -1,0 +1,337 @@
+{
+  "updatedAt": "2026-04-08T08:34:50.541Z",
+  "createdAt": "2026-04-08T08:34:39.297Z",
+  "id": "nwxIWsFGS6IjynCd",
+  "name": "Threadbot - Flujo 3 - Solicitud de Factura",
+  "description": null,
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "invoice-request",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "7c118438-1c54-4b5c-b581-fcdfd79913d6",
+      "name": "Webhook",
+      "webhookId": "9989fc44-0545-4f70-a045-1540cd490025"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.resend.com/emails",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "from",
+              "value": "ThreadBot <onboarding@resend.dev>"
+            },
+            {
+              "name": "to",
+              "value": "natescripts@gmail.com"
+            },
+            {
+              "name": "subject",
+              "value": "=📄 Nueva solicitud de factura — Pedido {{ $('Webhook').first().json.body.pedido_id }}"
+            },
+            {
+              "name": "html",
+              "value": "=<h2>Nueva solicitud de factura</h2>\n<p>Se ha recibido una solicitud de factura con los siguientes datos:</p>\n<table style=\"border-collapse:collapse;width:100%;\">\n  <tr><td style=\"padding:8px;border:1px solid #ddd;\"><strong>Nº pedido</strong></td><td style=\"padding:8px;border:1px solid #ddd;\">{{ $('Webhook').first().json.body.pedido_id }}</td></tr>\n  <tr><td style=\"padding:8px;border:1px solid #ddd;\"><strong>Cliente</strong></td><td style=\"padding:8px;border:1px solid #ddd;\">{{ $('Webhook').first().json.body.nombre_cliente }}</td></tr>\n  <tr><td style=\"padding:8px;border:1px solid #ddd;\"><strong>Email</strong></td><td style=\"padding:8px;border:1px solid #ddd;\">{{ $('Webhook').first().json.body.email_cliente }}</td></tr>\n  <tr><td style=\"padding:8px;border:1px solid #ddd;\"><strong>Total</strong></td><td style=\"padding:8px;border:1px solid #ddd;\">{{ $('Webhook').first().json.body.total }}€</td></tr>\n</table>\n<p>Por favor, genera y envía la factura al cliente a la mayor brevedad.</p>"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        416,
+        0
+      ],
+      "id": "a4d84c98-8c00-4d49-a77f-d4269d743321",
+      "name": "email a tienda",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "AlThGkQHEo1FTM7c",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.resend.com/emails",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "from",
+              "value": "ThreadBot <onboarding@resend.dev>"
+            },
+            {
+              "name": "to",
+              "value": "natescripts@gmail.com"
+            },
+            {
+              "name": "subject",
+              "value": "📄 Solicitud de factura recibida — ThreadCo"
+            },
+            {
+              "name": "html",
+              "value": "=<h2>Solicitud de factura recibida</h2>\n<p>Hola <strong>{{ $json.body.nombre_cliente }}</strong>,</p>\n<p>Hemos recibido tu solicitud de factura para el pedido nº <strong>{{ $json.body.pedido_id }}</strong>.</p>\n<p>Nuestro equipo la generará en breve y la recibirás en este email.</p>\n<p>Gracias,<br>ThreadCo</p>"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "8a5d16b8-7925-4e53-b174-0f93628fed42",
+      "name": "email a cliente",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "AlThGkQHEo1FTM7c",
+          "name": "Header Auth account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "email a cliente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "email a cliente": {
+      "main": [
+        [
+          {
+            "node": "email a tienda",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "3fe8f2c1-95d0-40c5-bd6b-8b902586e008",
+  "activeVersionId": "3fe8f2c1-95d0-40c5-bd6b-8b902586e008",
+  "versionCounter": 7,
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-04-08T08:34:39.297Z",
+      "createdAt": "2026-04-08T08:34:39.297Z",
+      "role": "workflow:owner",
+      "workflowId": "nwxIWsFGS6IjynCd",
+      "projectId": "sk2CqAXgcmkdjAtN",
+      "project": {
+        "updatedAt": "2026-04-08T08:32:06.544Z",
+        "createdAt": "2026-04-08T08:30:46.066Z",
+        "id": "sk2CqAXgcmkdjAtN",
+        "name": "Thread Bot <winowintest@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "e0d368c9-0ac9-4a14-929a-53fab6cf5d54"
+      }
+    }
+  ],
+  "tags": [],
+  "parentFolder": null,
+  "activeVersion": {
+    "updatedAt": "2026-04-08T08:59:40.940Z",
+    "createdAt": "2026-04-08T08:34:50.545Z",
+    "versionId": "3fe8f2c1-95d0-40c5-bd6b-8b902586e008",
+    "workflowId": "nwxIWsFGS6IjynCd",
+    "nodes": [
+      {
+        "parameters": {
+          "httpMethod": "POST",
+          "path": "invoice-request",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2.1,
+        "position": [
+          0,
+          0
+        ],
+        "id": "7c118438-1c54-4b5c-b581-fcdfd79913d6",
+        "name": "Webhook",
+        "webhookId": "9989fc44-0545-4f70-a045-1540cd490025"
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://api.resend.com/emails",
+          "authentication": "genericCredentialType",
+          "genericAuthType": "httpHeaderAuth",
+          "sendBody": true,
+          "bodyParameters": {
+            "parameters": [
+              {
+                "name": "from",
+                "value": "ThreadBot <onboarding@resend.dev>"
+              },
+              {
+                "name": "to",
+                "value": "natescripts@gmail.com"
+              },
+              {
+                "name": "subject",
+                "value": "=📄 Nueva solicitud de factura — Pedido {{ $('Webhook').first().json.body.pedido_id }}"
+              },
+              {
+                "name": "html",
+                "value": "=<h2>Nueva solicitud de factura</h2>\n<p>Se ha recibido una solicitud de factura con los siguientes datos:</p>\n<table style=\"border-collapse:collapse;width:100%;\">\n  <tr><td style=\"padding:8px;border:1px solid #ddd;\"><strong>Nº pedido</strong></td><td style=\"padding:8px;border:1px solid #ddd;\">{{ $('Webhook').first().json.body.pedido_id }}</td></tr>\n  <tr><td style=\"padding:8px;border:1px solid #ddd;\"><strong>Cliente</strong></td><td style=\"padding:8px;border:1px solid #ddd;\">{{ $('Webhook').first().json.body.nombre_cliente }}</td></tr>\n  <tr><td style=\"padding:8px;border:1px solid #ddd;\"><strong>Email</strong></td><td style=\"padding:8px;border:1px solid #ddd;\">{{ $('Webhook').first().json.body.email_cliente }}</td></tr>\n  <tr><td style=\"padding:8px;border:1px solid #ddd;\"><strong>Total</strong></td><td style=\"padding:8px;border:1px solid #ddd;\">{{ $('Webhook').first().json.body.total }}€</td></tr>\n</table>\n<p>Por favor, genera y envía la factura al cliente a la mayor brevedad.</p>"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          416,
+          0
+        ],
+        "id": "a4d84c98-8c00-4d49-a77f-d4269d743321",
+        "name": "email a tienda",
+        "credentials": {
+          "httpHeaderAuth": {
+            "id": "AlThGkQHEo1FTM7c",
+            "name": "Header Auth account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://api.resend.com/emails",
+          "authentication": "genericCredentialType",
+          "genericAuthType": "httpHeaderAuth",
+          "sendBody": true,
+          "bodyParameters": {
+            "parameters": [
+              {
+                "name": "from",
+                "value": "ThreadBot <onboarding@resend.dev>"
+              },
+              {
+                "name": "to",
+                "value": "natescripts@gmail.com"
+              },
+              {
+                "name": "subject",
+                "value": "📄 Solicitud de factura recibida — ThreadCo"
+              },
+              {
+                "name": "html",
+                "value": "=<h2>Solicitud de factura recibida</h2>\n<p>Hola <strong>{{ $json.body.nombre_cliente }}</strong>,</p>\n<p>Hemos recibido tu solicitud de factura para el pedido nº <strong>{{ $json.body.pedido_id }}</strong>.</p>\n<p>Nuestro equipo la generará en breve y la recibirás en este email.</p>\n<p>Gracias,<br>ThreadCo</p>"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          208,
+          0
+        ],
+        "id": "8a5d16b8-7925-4e53-b174-0f93628fed42",
+        "name": "email a cliente",
+        "credentials": {
+          "httpHeaderAuth": {
+            "id": "AlThGkQHEo1FTM7c",
+            "name": "Header Auth account"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "Webhook": {
+        "main": [
+          [
+            {
+              "node": "email a cliente",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "email a cliente": {
+        "main": [
+          [
+            {
+              "node": "email a tienda",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Thread Bot",
+    "name": "v1",
+    "description": "Production version startup",
+    "autosaved": true,
+    "workflowPublishHistory": [
+      {
+        "createdAt": "2026-04-08T08:59:40.936Z",
+        "id": 3,
+        "workflowId": "nwxIWsFGS6IjynCd",
+        "versionId": "3fe8f2c1-95d0-40c5-bd6b-8b902586e008",
+        "event": "activated",
+        "userId": "e0d368c9-0ac9-4a14-929a-53fab6cf5d54"
+      }
+    ]
+  },
+  "scopes": [
+    "workflow:create",
+    "workflow:delete",
+    "workflow:execute",
+    "workflow:execute-chat",
+    "workflow:list",
+    "workflow:move",
+    "workflow:publish",
+    "workflow:read",
+    "workflow:share",
+    "workflow:unpublish",
+    "workflow:unshare",
+    "workflow:update",
+    "workflow:updateRedactionSetting"
+  ],
+  "checksum": "d24f663425eae2a2340b48729b2c90eb946693b447a2c58f50c18648b83628f1"
+}

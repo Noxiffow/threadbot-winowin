@@ -1,0 +1,11 @@
+.venv
+__pycache__
+*.pyc
+*.pyo
+.git
+.env
+.env.*
+n8n_export
+*.md
+*.docx
+*.pdf

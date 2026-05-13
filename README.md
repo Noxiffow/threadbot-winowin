@@ -3,8 +3,9 @@
 Chatbot conversacional con IA para atención al cliente de una tienda de ropa. Desarrollado con FastAPI y Groq (llama-3.3-70b-versatile).
 Proyecto de prácticas en WinoWin · 2026.
 
-🔗 **Demo en vivo:** https://threadbot-winowin-production.up.railway.app  
-🔧 **Panel de administración:** https://threadbot-winowin-production.up.railway.app/admin
+🔗 **Demo en vivo:** https://threadbot-winowin.fly.dev  
+🔧 **Panel de administración:** https://threadbot-winowin.fly.dev/admin  
+⚙️ **n8n (automatizaciones):** https://threadbot-n8n.fly.dev
 
 ---
 
@@ -18,7 +19,7 @@ Proyecto de prácticas en WinoWin · 2026.
 | 4 | Automatizaciones n8n | ✅ Completada |
 | 5 | Interfaz web (frontend) | ✅ Completada |
 | 6 | Pruebas y ajustes | ✅ Completada |
-| 7 | Despliegue en Railway | ✅ Completada |
+| 7 | Despliegue (Railway → Fly.io + Neon) | ✅ Completada |
 | 8 | Panel admin + automatizaciones en nube + mejoras de venta | ✅ Completada |
 | 9 | Panel de control del chatbot (configuración sin código) | 🔵 En curso |
 
@@ -30,7 +31,7 @@ Proyecto de prácticas en WinoWin · 2026.
 - 🛍️ Flujo completo de pedido: catálogo → selección → confirmación → email automático
 - ❌ Cancelación de pedidos con verificación de email
 - 📦 Control de stock en tiempo real (descuento automático al comprar, reposición al cancelar)
-- 📧 Automatizaciones de email vía n8n en Railway:
+- 📧 Automatizaciones de email vía n8n:
   - Confirmación de pedido
   - Alerta de stock bajo al proveedor
   - Solicitud de factura
@@ -47,10 +48,10 @@ Proyecto de prácticas en WinoWin · 2026.
 |------------|------------|
 | Backend | FastAPI + Python |
 | Modelo LLM | Groq · llama-3.3-70b-versatile |
-| Base de datos | PostgreSQL (Railway) |
-| Automatizaciones | n8n (Railway) |
+| Base de datos | PostgreSQL (Neon — Frankfurt) |
+| Automatizaciones | n8n (Fly.io) |
 | Frontend | HTML + CSS + JS (sin frameworks) |
-| Despliegue | Railway (Dockerfile) |
+| Despliegue | Fly.io (Dockerfile) |
 | Email | Resend |
 
 ---
@@ -66,7 +67,6 @@ threadbot/
 │   │   └── prompts.py        # System prompt dinámico con catálogo
 │   ├── api/
 │   │   ├── chat.py           # Endpoints /chat, /orders, /alerts, /invoices, /products
-│   │   ├── admin.py          # Panel de administración /admin
 │   │   └── health.py         # Endpoint /health
 │   ├── services/
 │   │   ├── llm_service.py    # Lógica de chat, pedidos y cancelaciones
@@ -78,7 +78,7 @@ threadbot/
 │   │   └── db_models.py      # Modelos: Producto, Pedido, LineaPedido, SolicitudFactura, Alerta
 │   └── schemas/
 │       └── chat_schemas.py   # Pydantic request/response
-├── n8n/                      # Flujos exportados como JSON
+├── n8n_export/               # Flujos de n8n exportados como JSON
 ├── frontend/
 │   └── index.html            # Chat widget (dark premium, gold accents)
 ├── migrations/               # Alembic
@@ -91,7 +91,8 @@ threadbot/
 ├── .env.example
 ├── requirements.txt
 ├── Dockerfile
-└── railway.toml
+├── .dockerignore
+└── fly.toml                  # Configuración de despliegue Fly.io
 ```
 
 ---
@@ -121,10 +122,32 @@ Abre http://localhost:8000 para el chat widget y http://localhost:8000/admin par
 ## Variables de entorno
 
 ```
-GROQ_API_KEY=
-DATABASE_URL=
-RESEND_API_KEY=
+GROQ_API_KEY=          # API key de Groq
+DATABASE_URL=          # Connection string de PostgreSQL (Neon u otro)
+RESEND_API_KEY=        # API key de Resend para emails
+N8N_BASE_URL=          # URL base de n8n (ej: https://threadbot-n8n.fly.dev)
+APP_BASE_URL=          # URL pública de esta app (ej: https://threadbot-winowin.fly.dev)
 ```
+
+---
+
+## Despliegue en Fly.io
+
+```bash
+# Login
+fly auth login
+
+# Desplegar la app
+fly deploy --remote-only
+
+# Configurar variables de entorno
+fly secrets set GROQ_API_KEY=... DATABASE_URL=... RESEND_API_KEY=... \
+  N8N_BASE_URL=https://threadbot-n8n.fly.dev \
+  APP_BASE_URL=https://threadbot-winowin.fly.dev
+```
+
+El n8n corre como app separada en `threadbot-n8n` (ver `fly.n8n.toml`).  
+Los workflows se importan desde `n8n_export/` via la API de n8n tras el primer despliegue.
 
 ---
 

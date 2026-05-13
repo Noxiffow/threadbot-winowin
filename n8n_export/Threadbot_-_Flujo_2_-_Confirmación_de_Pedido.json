@@ -1,0 +1,227 @@
+{
+  "updatedAt": "2026-04-08T10:26:05.830Z",
+  "createdAt": "2026-04-08T08:34:23.539Z",
+  "id": "04EE2YwUTHdEn4x9",
+  "name": "Threadbot - Flujo 2 - Confirmación de Pedido",
+  "description": null,
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "order-confirmed",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "f2f4ab2f-ab6b-4454-b76f-185e7df832e8",
+      "name": "Webhook",
+      "webhookId": "102d1bc1-9de9-46ce-9ca5-cda483542760"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.resend.com/emails",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "from",
+              "value": "ThreadBot <onboarding@resend.dev>"
+            },
+            {
+              "name": "to",
+              "value": "natescripts@gmail.com"
+            },
+            {
+              "name": "subject",
+              "value": "✅ Pedido confirmado — ThreadCo"
+            },
+            {
+              "name": "html",
+              "value": "=<div style=\"background-color:#0f0f0f;padding:0;margin:0;font-family:'Helvetica Neue',Arial,sans-serif;\">   <div style=\"max-width:600px;margin:0 auto;background-color:#1a1a1a;border-top:4px solid #c9a84c;\">          <div style=\"padding:32px 40px 24px;border-bottom:1px solid #2a2a2a;\">       <p style=\"margin:0;font-size:24px;font-weight:bold;color:#c9a84c;letter-spacing:3px;\">THREADBOT</p>       <p style=\"margin:4px 0 0;font-size:12px;color:#888888;letter-spacing:1px;\">ASISTENTE VIRTUAL · THREADCO</p>     </div>      <div style=\"padding:36px 40px;\">       <p style=\"margin:0 0 8px;font-size:22px;font-weight:bold;color:#ffffff;\">✅ Pedido confirmado</p>       <p style=\"margin:0 0 28px;font-size:15px;color:#aaaaaa;\">Hola <strong style=\"color:#ffffff;\">{{ $json.body.nombre_cliente }}</strong>, tu pedido en ThreadCo ha sido confirmado.</p>        <div style=\"background-color:#252525;border-radius:4px;padding:20px 24px;margin-bottom:24px;\">         <p style=\"margin:0 0 6px;font-size:11px;color:#c9a84c;font-weight:bold;letter-spacing:1px;\">Nº DE PEDIDO</p>         <p style=\"margin:0 0 20px;font-size:18px;color:#ffffff;font-weight:bold;\">#{{ $json.body.pedido_id }}</p>          <p style=\"margin:0 0 6px;font-size:11px;color:#c9a84c;font-weight:bold;letter-spacing:1px;\">CLIENTE</p>         <p style=\"margin:0 0 20px;font-size:15px;color:#ffffff;\">{{ $json.body.nombre_cliente }}</p>          <p style=\"margin:0 0 6px;font-size:11px;color:#c9a84c;font-weight:bold;letter-spacing:1px;\">DIRECCIÓN DE ENVÍO</p>         <p style=\"margin:0 0 20px;font-size:15px;color:#ffffff;line-height:1.5;word-break:break-word;\">{{ $json.body.direccion }}</p>          <p style=\"margin:0 0 6px;font-size:11px;color:#c9a84c;font-weight:bold;letter-spacing:1px;\">TOTAL</p>         <p style=\"margin:0;font-size:20px;color:#c9a84c;font-weight:bold;\">{{ $json.body.total }}€</p>       </div>        <p style=\"margin:0 0 24px;font-size:14px;color:#aaaaaa;line-height:1.6;\">Recibirás tu pedido en los próximos días. Si tienes cualquier duda, puedes contactarnos a través del chat en nuestra web.</p>        <div style=\"background-color:#252525;border-left:3px solid #c9a84c;padding:14px 18px;\">         <p style=\"margin:0;font-size:12px;color:#888888;font-style:italic;\">Este es un email de demostración. En producción, el diseño se adaptará a la imagen corporativa de tu negocio.</p>       </div>     </div>      <div style=\"padding:20px 40px;border-top:1px solid #2a2a2a;text-align:center;\">       <p style=\"margin:0;font-size:12px;color:#555555;\">ThreadBot · Desarrollado por <strong style=\"color:#888888;\">WinoWin</strong></p>     </div>    </div> </div>"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        176,
+        16
+      ],
+      "id": "92ccc732-768a-40f3-8269-35224de86afe",
+      "name": "HTTP Request",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "AlThGkQHEo1FTM7c",
+          "name": "Header Auth account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "06e92293-22df-4238-a170-fe4641355c7d",
+  "activeVersionId": "06e92293-22df-4238-a170-fe4641355c7d",
+  "versionCounter": 12,
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-04-08T08:34:23.539Z",
+      "createdAt": "2026-04-08T08:34:23.539Z",
+      "role": "workflow:owner",
+      "workflowId": "04EE2YwUTHdEn4x9",
+      "projectId": "sk2CqAXgcmkdjAtN",
+      "project": {
+        "updatedAt": "2026-04-08T08:32:06.544Z",
+        "createdAt": "2026-04-08T08:30:46.066Z",
+        "id": "sk2CqAXgcmkdjAtN",
+        "name": "Thread Bot <winowintest@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "e0d368c9-0ac9-4a14-929a-53fab6cf5d54"
+      }
+    }
+  ],
+  "tags": [],
+  "parentFolder": null,
+  "activeVersion": {
+    "updatedAt": "2026-04-08T10:32:16.204Z",
+    "createdAt": "2026-04-08T10:26:05.833Z",
+    "versionId": "06e92293-22df-4238-a170-fe4641355c7d",
+    "workflowId": "04EE2YwUTHdEn4x9",
+    "nodes": [
+      {
+        "parameters": {
+          "httpMethod": "POST",
+          "path": "order-confirmed",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2.1,
+        "position": [
+          0,
+          0
+        ],
+        "id": "f2f4ab2f-ab6b-4454-b76f-185e7df832e8",
+        "name": "Webhook",
+        "webhookId": "102d1bc1-9de9-46ce-9ca5-cda483542760"
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://api.resend.com/emails",
+          "authentication": "genericCredentialType",
+          "genericAuthType": "httpHeaderAuth",
+          "sendBody": true,
+          "bodyParameters": {
+            "parameters": [
+              {
+                "name": "from",
+                "value": "ThreadBot <onboarding@resend.dev>"
+              },
+              {
+                "name": "to",
+                "value": "natescripts@gmail.com"
+              },
+              {
+                "name": "subject",
+                "value": "✅ Pedido confirmado — ThreadCo"
+              },
+              {
+                "name": "html",
+                "value": "=<div style=\"background-color:#0f0f0f;padding:0;margin:0;font-family:'Helvetica Neue',Arial,sans-serif;\">   <div style=\"max-width:600px;margin:0 auto;background-color:#1a1a1a;border-top:4px solid #c9a84c;\">          <div style=\"padding:32px 40px 24px;border-bottom:1px solid #2a2a2a;\">       <p style=\"margin:0;font-size:24px;font-weight:bold;color:#c9a84c;letter-spacing:3px;\">THREADBOT</p>       <p style=\"margin:4px 0 0;font-size:12px;color:#888888;letter-spacing:1px;\">ASISTENTE VIRTUAL · THREADCO</p>     </div>      <div style=\"padding:36px 40px;\">       <p style=\"margin:0 0 8px;font-size:22px;font-weight:bold;color:#ffffff;\">✅ Pedido confirmado</p>       <p style=\"margin:0 0 28px;font-size:15px;color:#aaaaaa;\">Hola <strong style=\"color:#ffffff;\">{{ $json.body.nombre_cliente }}</strong>, tu pedido en ThreadCo ha sido confirmado.</p>        <div style=\"background-color:#252525;border-radius:4px;padding:20px 24px;margin-bottom:24px;\">         <p style=\"margin:0 0 6px;font-size:11px;color:#c9a84c;font-weight:bold;letter-spacing:1px;\">Nº DE PEDIDO</p>         <p style=\"margin:0 0 20px;font-size:18px;color:#ffffff;font-weight:bold;\">#{{ $json.body.pedido_id }}</p>          <p style=\"margin:0 0 6px;font-size:11px;color:#c9a84c;font-weight:bold;letter-spacing:1px;\">CLIENTE</p>         <p style=\"margin:0 0 20px;font-size:15px;color:#ffffff;\">{{ $json.body.nombre_cliente }}</p>          <p style=\"margin:0 0 6px;font-size:11px;color:#c9a84c;font-weight:bold;letter-spacing:1px;\">DIRECCIÓN DE ENVÍO</p>         <p style=\"margin:0 0 20px;font-size:15px;color:#ffffff;line-height:1.5;word-break:break-word;\">{{ $json.body.direccion }}</p>          <p style=\"margin:0 0 6px;font-size:11px;color:#c9a84c;font-weight:bold;letter-spacing:1px;\">TOTAL</p>         <p style=\"margin:0;font-size:20px;color:#c9a84c;font-weight:bold;\">{{ $json.body.total }}€</p>       </div>        <p style=\"margin:0 0 24px;font-size:14px;color:#aaaaaa;line-height:1.6;\">Recibirás tu pedido en los próximos días. Si tienes cualquier duda, puedes contactarnos a través del chat en nuestra web.</p>        <div style=\"background-color:#252525;border-left:3px solid #c9a84c;padding:14px 18px;\">         <p style=\"margin:0;font-size:12px;color:#888888;font-style:italic;\">Este es un email de demostración. En producción, el diseño se adaptará a la imagen corporativa de tu negocio.</p>       </div>     </div>      <div style=\"padding:20px 40px;border-top:1px solid #2a2a2a;text-align:center;\">       <p style=\"margin:0;font-size:12px;color:#555555;\">ThreadBot · Desarrollado por <strong style=\"color:#888888;\">WinoWin</strong></p>     </div>    </div> </div>"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          176,
+          16
+        ],
+        "id": "92ccc732-768a-40f3-8269-35224de86afe",
+        "name": "HTTP Request",
+        "credentials": {
+          "httpHeaderAuth": {
+            "id": "AlThGkQHEo1FTM7c",
+            "name": "Header Auth account"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "Webhook": {
+        "main": [
+          [
+            {
+              "node": "HTTP Request",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Thread Bot",
+    "name": "v3",
+    "description": "Optimized confirmation email further.",
+    "autosaved": true,
+    "workflowPublishHistory": [
+      {
+        "createdAt": "2026-04-08T10:32:16.154Z",
+        "id": 8,
+        "workflowId": "04EE2YwUTHdEn4x9",
+        "versionId": "06e92293-22df-4238-a170-fe4641355c7d",
+        "event": "activated",
+        "userId": "e0d368c9-0ac9-4a14-929a-53fab6cf5d54"
+      }
+    ]
+  },
+  "scopes": [
+    "workflow:create",
+    "workflow:delete",
+    "workflow:execute",
+    "workflow:execute-chat",
+    "workflow:list",
+    "workflow:move",
+    "workflow:publish",
+    "workflow:read",
+    "workflow:share",
+    "workflow:unpublish",
+    "workflow:unshare",
+    "workflow:update",
+    "workflow:updateRedactionSetting"
+  ],
+  "checksum": "b6ef131b2ebaa3afadd451e755a373a9d63aec2bca4b6056c6f3320790a48bc1"
+}

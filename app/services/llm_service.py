@@ -1,5 +1,5 @@
 from fastapi import HTTPException
-from app.core.config import groq_client
+from app.core.config import groq_client, N8N_BASE_URL, APP_BASE_URL
 from app.core.prompts import get_system_prompt
 from app.services.session import get_or_create_session, append_message
 from app.services.orders import crear_pedido
@@ -124,7 +124,7 @@ def cancelar_pedido_por_id(pedido_id: int, email_verificacion: str) -> dict:
         db.commit()
 
         try:
-            webhook_url = "https://n8n-production-6d70.up.railway.app/webhook/order-status"
+            webhook_url = f"{N8N_BASE_URL}/webhook/order-status"
             payload = {
                 "pedido_id": pedido.id,
                 "nombre_cliente": pedido.nombre_cliente,
@@ -230,7 +230,7 @@ def chat_with_bot(session_id: str, user_message: str) -> str:
                     # Confirmar el pedido automáticamente
                     try:
                         httpx.post(
-                            f"https://threadbot-winowin-production.up.railway.app/orders/{pedido.id}/confirm",
+                            f"{APP_BASE_URL}/orders/{pedido.id}/confirm",
                             params={"api_key": "threadbot-internal-key"},
                             timeout=5
                         )
@@ -240,7 +240,7 @@ def chat_with_bot(session_id: str, user_message: str) -> str:
                     # Notificar a n8n
                     try:
                         httpx.post(
-                            "https://n8n-production-6d70.up.railway.app/webhook/order-confirmed",
+                            f"{N8N_BASE_URL}/webhook/order-confirmed",
                             json={
                                 "pedido_id": pedido.id,
                                 "estado": "confirmado",

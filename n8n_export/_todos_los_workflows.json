@@ -1,0 +1,98 @@
+[
+  {
+    "updatedAt": "2026-04-08T08:34:50.541Z",
+    "createdAt": "2026-04-08T08:34:39.297Z",
+    "id": "nwxIWsFGS6IjynCd",
+    "name": "Threadbot - Flujo 3 - Solicitud de Factura",
+    "description": null,
+    "active": true,
+    "isArchived": false,
+    "settings": {
+      "executionOrder": "v1",
+      "binaryMode": "separate"
+    },
+    "versionId": "3fe8f2c1-95d0-40c5-bd6b-8b902586e008",
+    "activeVersionId": "3fe8f2c1-95d0-40c5-bd6b-8b902586e008",
+    "parentFolder": null,
+    "tags": [],
+    "homeProject": {
+      "id": "sk2CqAXgcmkdjAtN",
+      "type": "personal",
+      "name": "Thread Bot <winowintest@gmail.com>",
+      "icon": null
+    },
+    "sharedWithProjects": []
+  },
+  {
+    "updatedAt": "2026-04-08T08:35:08.455Z",
+    "createdAt": "2026-04-08T08:35:03.919Z",
+    "id": "19tgKMdeUtqCcTKQ",
+    "name": "Threadbot - Flujo 4 - Seguimiento de Pedido",
+    "description": null,
+    "active": true,
+    "isArchived": false,
+    "settings": {
+      "executionOrder": "v1",
+      "binaryMode": "separate"
+    },
+    "versionId": "03ad19b8-cf78-4d9b-b8de-c4065ccaa4ef",
+    "activeVersionId": "03ad19b8-cf78-4d9b-b8de-c4065ccaa4ef",
+    "parentFolder": null,
+    "tags": [],
+    "homeProject": {
+      "id": "sk2CqAXgcmkdjAtN",
+      "type": "personal",
+      "name": "Thread Bot <winowintest@gmail.com>",
+      "icon": null
+    },
+    "sharedWithProjects": []
+  },
+  {
+    "updatedAt": "2026-04-08T10:26:05.830Z",
+    "createdAt": "2026-04-08T08:34:23.539Z",
+    "id": "04EE2YwUTHdEn4x9",
+    "name": "Threadbot - Flujo 2 - Confirmación de Pedido",
+    "description": null,
+    "active": true,
+    "isArchived": false,
+    "settings": {
+      "executionOrder": "v1",
+      "binaryMode": "separate"
+    },
+    "versionId": "06e92293-22df-4238-a170-fe4641355c7d",
+    "activeVersionId": "06e92293-22df-4238-a170-fe4641355c7d",
+    "parentFolder": null,
+    "tags": [],
+    "homeProject": {
+      "id": "sk2CqAXgcmkdjAtN",
+      "type": "personal",
+      "name": "Thread Bot <winowintest@gmail.com>",
+      "icon": null
+    },
+    "sharedWithProjects": []
+  },
+  {
+    "updatedAt": "2026-04-09T09:11:12.822Z",
+    "createdAt": "2026-04-08T08:34:05.008Z",
+    "id": "ka7Qw50uGXLOfXe4",
+    "name": "Threadbot - Flujo 1 - Alerta Stock Bajo",
+    "description": null,
+    "active": true,
+    "isArchived": false,
+    "settings": {
+      "executionOrder": "v1",
+      "binaryMode": "separate"
+    },
+    "versionId": "af442a7c-42ba-44eb-ab3e-e232a45c716b",
+    "activeVersionId": "af442a7c-42ba-44eb-ab3e-e232a45c716b",
+    "parentFolder": null,
+    "tags": [],
+    "homeProject": {
+      "id": "sk2CqAXgcmkdjAtN",
+      "type": "personal",
+      "name": "Thread Bot <winowintest@gmail.com>",
+      "icon": null
+    },
+    "sharedWithProjects": []
+  }
+]

@@ -1,0 +1,583 @@
+{
+  "updatedAt": "2026-04-09T09:11:12.822Z",
+  "createdAt": "2026-04-08T08:34:05.008Z",
+  "id": "ka7Qw50uGXLOfXe4",
+  "name": "Threadbot - Flujo 1 - Alerta Stock Bajo",
+  "description": null,
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -624,
+        224
+      ],
+      "id": "085cf927-144d-462b-99ee-cf9ce07a22a4",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "url": "https://threadbot-winowin-production.up.railway.app/alerts/pending",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "api_key",
+              "value": "threadbot-internal-key"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -416,
+        224
+      ],
+      "id": "9b81f020-a72e-4df1-b7dc-ac789cc90d4f",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "7e7eb473-0b2d-47a4-ad39-20c60b22fff1",
+              "leftValue": "={{ $json.total }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -208,
+        224
+      ],
+      "id": "0a01c48e-9991-4e82-baa9-23a8372f2348",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $input.first().json;\nconst alertas = data.alertas;\n\nlet filas = alertas.map((a, i) => \n  `<tr style=\"background-color:${i % 2 === 0 ? '#1e1e1e' : '#252525'};\">\n    <td style=\"padding:14px 16px;font-size:14px;color:#ffffff;border-bottom:1px solid #333333;\">${a.mensaje}</td>\n    <td style=\"padding:14px 16px;font-size:13px;color:#888888;border-bottom:1px solid #333333;\">${a.fecha.split('.')[0]}</td>\n  </tr>`\n).join('');\n\nconst htmlEmail = `\n<div style=\"background-color:#0f0f0f;padding:0;margin:0;font-family:'Helvetica Neue',Arial,sans-serif;\">\n  <div style=\"max-width:600px;margin:0 auto;background-color:#1a1a1a;border-top:4px solid #c9a84c;\">\n    \n    <div style=\"padding:32px 40px 24px;border-bottom:1px solid #2a2a2a;\">\n      <p style=\"margin:0;font-size:24px;font-weight:bold;color:#c9a84c;letter-spacing:3px;\">THREADBOT</p>\n      <p style=\"margin:4px 0 0;font-size:12px;color:#888888;letter-spacing:1px;\">AVISO INTERNO · THREADCO</p>\n    </div>\n\n    <div style=\"padding:36px 40px;\">\n      <p style=\"margin:0 0 8px;font-size:22px;font-weight:bold;color:#ffffff;\">⚠️ Stock bajo — reposición urgente</p>\n      <p style=\"margin:0 0 28px;font-size:15px;color:#aaaaaa;\">Los siguientes productos tienen stock bajo y requieren gestión de reabastecimiento:</p>\n\n      <table style=\"width:100%;border-collapse:collapse;margin-bottom:28px;\">\n        <tr style=\"background-color:#252525;\">\n          <td style=\"padding:14px 16px;font-size:11px;color:#c9a84c;font-weight:bold;letter-spacing:1px;border-bottom:1px solid #333333;\">PRODUCTO</td>\n          <td style=\"padding:14px 16px;font-size:11px;color:#c9a84c;font-weight:bold;letter-spacing:1px;border-bottom:1px solid #333333;\">FECHA</td>\n        </tr>\n        ${filas}\n      </table>\n\n      <p style=\"margin:0 0 28px;font-size:14px;color:#aaaaaa;line-height:1.6;\">Por favor, contacte con el proveedor correspondiente para gestionar la reposición.</p>\n\n      <div style=\"background-color:#252525;border-left:3px solid #c9a84c;padding:14px 18px;\">\n        <p style=\"margin:0;font-size:12px;color:#888888;font-style:italic;\">Este es un aviso automático generado por ThreadBot · ThreadCo</p>\n      </div>\n    </div>\n\n    <div style=\"padding:20px 40px;border-top:1px solid #2a2a2a;text-align:center;\">\n      <p style=\"margin:0;font-size:12px;color:#555555;\">ThreadBot · Desarrollado por <strong style=\"color:#888888;\">WinoWin</strong></p>\n    </div>\n\n  </div>\n</div>\n`;\n\nconst ids = alertas.map(a => a.id);\nreturn [{ json: { htmlEmail, ids, total: alertas.length } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "ab198b28-6211-4c0d-96de-deb9a8246faa",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.resend.com/emails",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "from",
+              "value": "ThreadBot <onboarding@resend.dev>"
+            },
+            {
+              "name": "to",
+              "value": "natescripts@gmail.com"
+            },
+            {
+              "name": "subject",
+              "value": "⚠ Reposición de stock necesaria — ThreadCo"
+            },
+            {
+              "name": "html",
+              "value": "={{ $json.htmlEmail }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        256,
+        128
+      ],
+      "id": "a2cb356d-6e2b-437b-8e59-aad82f928c27",
+      "name": "Resend",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "AlThGkQHEo1FTM7c",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://threadbot-winowin-production.up.railway.app/alerts/{{ $json.alerta_id }}/mark-sent",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "api_key",
+              "value": "threadbot-internal-key"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        688,
+        128
+      ],
+      "id": "06077abd-2b5d-40a4-89b6-898f61898712",
+      "name": "mark-sent"
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $('HTTP Request').first().json;\nconst ids = data.alertas.map(a => a.id);\n\nreturn ids.map(id => ({ json: { alerta_id: parseInt(id) } }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        464,
+        128
+      ],
+      "id": "1be25d7e-a8ea-4fee-846b-ed839ec0ec60",
+      "name": "Separador de items"
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Resend",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Resend": {
+      "main": [
+        [
+          {
+            "node": "Separador de items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Separador de items": {
+      "main": [
+        [
+          {
+            "node": "mark-sent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrenceRules": []
+    }
+  },
+  "meta": null,
+  "pinData": {},
+  "versionId": "af442a7c-42ba-44eb-ab3e-e232a45c716b",
+  "activeVersionId": "af442a7c-42ba-44eb-ab3e-e232a45c716b",
+  "versionCounter": 41,
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-04-08T08:34:05.008Z",
+      "createdAt": "2026-04-08T08:34:05.008Z",
+      "role": "workflow:owner",
+      "workflowId": "ka7Qw50uGXLOfXe4",
+      "projectId": "sk2CqAXgcmkdjAtN",
+      "project": {
+        "updatedAt": "2026-04-08T08:32:06.544Z",
+        "createdAt": "2026-04-08T08:30:46.066Z",
+        "id": "sk2CqAXgcmkdjAtN",
+        "name": "Thread Bot <winowintest@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "e0d368c9-0ac9-4a14-929a-53fab6cf5d54"
+      }
+    }
+  ],
+  "tags": [],
+  "parentFolder": null,
+  "activeVersion": {
+    "updatedAt": "2026-04-09T09:11:15.655Z",
+    "createdAt": "2026-04-09T09:11:12.826Z",
+    "versionId": "af442a7c-42ba-44eb-ab3e-e232a45c716b",
+    "workflowId": "ka7Qw50uGXLOfXe4",
+    "nodes": [
+      {
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "field": "hours"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.3,
+        "position": [
+          -624,
+          224
+        ],
+        "id": "085cf927-144d-462b-99ee-cf9ce07a22a4",
+        "name": "Schedule Trigger"
+      },
+      {
+        "parameters": {
+          "url": "https://threadbot-winowin-production.up.railway.app/alerts/pending",
+          "sendQuery": true,
+          "queryParameters": {
+            "parameters": [
+              {
+                "name": "api_key",
+                "value": "threadbot-internal-key"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          -416,
+          224
+        ],
+        "id": "9b81f020-a72e-4df1-b7dc-ac789cc90d4f",
+        "name": "HTTP Request"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "7e7eb473-0b2d-47a4-ad39-20c60b22fff1",
+                "leftValue": "={{ $json.total }}",
+                "rightValue": 0,
+                "operator": {
+                  "type": "number",
+                  "operation": "gt"
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          -208,
+          224
+        ],
+        "id": "0a01c48e-9991-4e82-baa9-23a8372f2348",
+        "name": "If"
+      },
+      {
+        "parameters": {
+          "jsCode": "const data = $input.first().json;\nconst alertas = data.alertas;\n\nlet filas = alertas.map((a, i) => \n  `<tr style=\"background-color:${i % 2 === 0 ? '#1e1e1e' : '#252525'};\">\n    <td style=\"padding:14px 16px;font-size:14px;color:#ffffff;border-bottom:1px solid #333333;\">${a.mensaje}</td>\n    <td style=\"padding:14px 16px;font-size:13px;color:#888888;border-bottom:1px solid #333333;\">${a.fecha.split('.')[0]}</td>\n  </tr>`\n).join('');\n\nconst htmlEmail = `\n<div style=\"background-color:#0f0f0f;padding:0;margin:0;font-family:'Helvetica Neue',Arial,sans-serif;\">\n  <div style=\"max-width:600px;margin:0 auto;background-color:#1a1a1a;border-top:4px solid #c9a84c;\">\n    \n    <div style=\"padding:32px 40px 24px;border-bottom:1px solid #2a2a2a;\">\n      <p style=\"margin:0;font-size:24px;font-weight:bold;color:#c9a84c;letter-spacing:3px;\">THREADBOT</p>\n      <p style=\"margin:4px 0 0;font-size:12px;color:#888888;letter-spacing:1px;\">AVISO INTERNO · THREADCO</p>\n    </div>\n\n    <div style=\"padding:36px 40px;\">\n      <p style=\"margin:0 0 8px;font-size:22px;font-weight:bold;color:#ffffff;\">⚠️ Stock bajo — reposición urgente</p>\n      <p style=\"margin:0 0 28px;font-size:15px;color:#aaaaaa;\">Los siguientes productos tienen stock bajo y requieren gestión de reabastecimiento:</p>\n\n      <table style=\"width:100%;border-collapse:collapse;margin-bottom:28px;\">\n        <tr style=\"background-color:#252525;\">\n          <td style=\"padding:14px 16px;font-size:11px;color:#c9a84c;font-weight:bold;letter-spacing:1px;border-bottom:1px solid #333333;\">PRODUCTO</td>\n          <td style=\"padding:14px 16px;font-size:11px;color:#c9a84c;font-weight:bold;letter-spacing:1px;border-bottom:1px solid #333333;\">FECHA</td>\n        </tr>\n        ${filas}\n      </table>\n\n      <p style=\"margin:0 0 28px;font-size:14px;color:#aaaaaa;line-height:1.6;\">Por favor, contacte con el proveedor correspondiente para gestionar la reposición.</p>\n\n      <div style=\"background-color:#252525;border-left:3px solid #c9a84c;padding:14px 18px;\">\n        <p style=\"margin:0;font-size:12px;color:#888888;font-style:italic;\">Este es un aviso automático generado por ThreadBot · ThreadCo</p>\n      </div>\n    </div>\n\n    <div style=\"padding:20px 40px;border-top:1px solid #2a2a2a;text-align:center;\">\n      <p style=\"margin:0;font-size:12px;color:#555555;\">ThreadBot · Desarrollado por <strong style=\"color:#888888;\">WinoWin</strong></p>\n    </div>\n\n  </div>\n</div>\n`;\n\nconst ids = alertas.map(a => a.id);\nreturn [{ json: { htmlEmail, ids, total: alertas.length } }];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          0,
+          0
+        ],
+        "id": "ab198b28-6211-4c0d-96de-deb9a8246faa",
+        "name": "Code in JavaScript"
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://api.resend.com/emails",
+          "authentication": "genericCredentialType",
+          "genericAuthType": "httpHeaderAuth",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Authorization"
+              },
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "sendBody": true,
+          "bodyParameters": {
+            "parameters": [
+              {
+                "name": "from",
+                "value": "ThreadBot <onboarding@resend.dev>"
+              },
+              {
+                "name": "to",
+                "value": "natescripts@gmail.com"
+              },
+              {
+                "name": "subject",
+                "value": "⚠ Reposición de stock necesaria — ThreadCo"
+              },
+              {
+                "name": "html",
+                "value": "={{ $json.htmlEmail }}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          256,
+          128
+        ],
+        "id": "a2cb356d-6e2b-437b-8e59-aad82f928c27",
+        "name": "Resend",
+        "credentials": {
+          "httpHeaderAuth": {
+            "id": "AlThGkQHEo1FTM7c",
+            "name": "Header Auth account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "=https://threadbot-winowin-production.up.railway.app/alerts/{{ $json.alerta_id }}/mark-sent",
+          "sendQuery": true,
+          "queryParameters": {
+            "parameters": [
+              {
+                "name": "api_key",
+                "value": "threadbot-internal-key"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          688,
+          128
+        ],
+        "id": "06077abd-2b5d-40a4-89b6-898f61898712",
+        "name": "mark-sent"
+      },
+      {
+        "parameters": {
+          "jsCode": "const data = $('HTTP Request').first().json;\nconst ids = data.alertas.map(a => a.id);\n\nreturn ids.map(id => ({ json: { alerta_id: parseInt(id) } }));"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          464,
+          128
+        ],
+        "id": "1be25d7e-a8ea-4fee-846b-ed839ec0ec60",
+        "name": "Separador de items"
+      }
+    ],
+    "connections": {
+      "Schedule Trigger": {
+        "main": [
+          [
+            {
+              "node": "HTTP Request",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "HTTP Request": {
+        "main": [
+          [
+            {
+              "node": "If",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "If": {
+        "main": [
+          [
+            {
+              "node": "Code in JavaScript",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code in JavaScript": {
+        "main": [
+          [
+            {
+              "node": "Resend",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Resend": {
+        "main": [
+          [
+            {
+              "node": "Separador de items",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Separador de items": {
+        "main": [
+          [
+            {
+              "node": "mark-sent",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Thread Bot",
+    "name": "Version af442a7c",
+    "description": "",
+    "autosaved": true,
+    "workflowPublishHistory": [
+      {
+        "createdAt": "2026-04-09T09:11:15.651Z",
+        "id": 22,
+        "workflowId": "ka7Qw50uGXLOfXe4",
+        "versionId": "af442a7c-42ba-44eb-ab3e-e232a45c716b",
+        "event": "activated",
+        "userId": "e0d368c9-0ac9-4a14-929a-53fab6cf5d54"
+      }
+    ]
+  },
+  "scopes": [
+    "workflow:create",
+    "workflow:delete",
+    "workflow:execute",
+    "workflow:execute-chat",
+    "workflow:list",
+    "workflow:move",
+    "workflow:publish",
+    "workflow:read",
+    "workflow:share",
+    "workflow:unpublish",
+    "workflow:unshare",
+    "workflow:update",
+    "workflow:updateRedactionSetting"
+  ],
+  "checksum": "9837f0f4eef6a23af9cc27a3f055e74c6715c9c48b7c3c475c482ccb761b5bf9"
+}

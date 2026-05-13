@@ -1,0 +1,591 @@
+{
+  "productos": [
+    {
+      "id": "6",
+      "nombre": "Shorts cargo beige",
+      "precio_cents": "3000",
+      "stock": "20",
+      "categoria": "pantalones",
+      "tallas": "S,M,L",
+      "activo": "True"
+    },
+    {
+      "id": "2",
+      "nombre": "Camiseta básica negra",
+      "precio_cents": "1500",
+      "stock": "51",
+      "categoria": "camisetas",
+      "tallas": "S,M,L,XL",
+      "activo": "True"
+    },
+    {
+      "id": "4",
+      "nombre": "Vaqueros slim fit azul",
+      "precio_cents": "4500",
+      "stock": "25",
+      "categoria": "pantalones",
+      "tallas": "28,30,32,34",
+      "activo": "True"
+    },
+    {
+      "id": "1",
+      "nombre": "Camiseta básica blanca",
+      "precio_cents": "1500",
+      "stock": "48",
+      "categoria": "camisetas",
+      "tallas": "S,M,L,XL",
+      "activo": "True"
+    },
+    {
+      "id": "3",
+      "nombre": "Sudadera gris con capucha",
+      "precio_cents": "3500",
+      "stock": "25",
+      "categoria": "sudaderas",
+      "tallas": "M,L,XL",
+      "activo": "True"
+    },
+    {
+      "id": "5",
+      "nombre": "Chaqueta bomber negra",
+      "precio_cents": "7500",
+      "stock": "20",
+      "categoria": "chaquetas",
+      "tallas": "M,L,XL",
+      "activo": "True"
+    }
+  ],
+  "pedidos": [
+    {
+      "id": "1",
+      "session_id": "test_pedido",
+      "nombre_cliente": "Ana García",
+      "email_cliente": "ana@test.com",
+      "direccion": "Calle Mayor 1, Madrid",
+      "estado": "confirmado",
+      "total_cents": "6500",
+      "notas": null,
+      "fecha_creacion": "2026-03-17 10:49:47.985974"
+    },
+    {
+      "id": "4",
+      "session_id": "7387956b-689f-4e04-aae8-fd7a6f7ac20b",
+      "nombre_cliente": "Carlos Gutiérrez",
+      "email_cliente": "natescripts@gmail.com",
+      "direccion": "Calle Gran Vía 10, Madrid",
+      "estado": "pendiente",
+      "total_cents": "1500",
+      "notas": null,
+      "fecha_creacion": "2026-03-24 10:38:08.354250"
+    },
+    {
+      "id": "5",
+      "session_id": "08bb1f3c-78d4-44a9-853d-c00773478ba8",
+      "nombre_cliente": "Test Test",
+      "email_cliente": "natescripts@gmail.com",
+      "direccion": "Calle Gran Vía 10, Madrid",
+      "estado": "cancelado",
+      "total_cents": "1500",
+      "notas": null,
+      "fecha_creacion": "2026-03-24 10:55:18.399614"
+    },
+    {
+      "id": "3",
+      "session_id": "3b1d1db6-87d7-4dd1-bf77-4d24606437dd",
+      "nombre_cliente": "completo",
+      "email_cliente": "natescripts@gmail.com",
+      "direccion": "Calle Gran Vía 10, Madrid",
+      "estado": "pendiente",
+      "total_cents": "1500",
+      "notas": null,
+      "fecha_creacion": "2026-03-24 10:30:44.976140"
+    },
+    {
+      "id": "6",
+      "session_id": "e30e7973-cb21-4365-8806-30e2b951d5ef",
+      "nombre_cliente": "Jonathan Neto",
+      "email_cliente": "natescripts@gmail.com",
+      "direccion": "Calle Martínez Seco, 44",
+      "estado": "cancelado",
+      "total_cents": "3500",
+      "notas": null,
+      "fecha_creacion": "2026-04-08 09:19:58.682928"
+    },
+    {
+      "id": "7",
+      "session_id": "133121d0-6e48-4ae7-8826-fa0d68af8a32",
+      "nombre_cliente": "Jonathan Neto",
+      "email_cliente": "natescripts@gmail.com",
+      "direccion": "calle martínez Seco 44, piso",
+      "estado": "pendiente",
+      "total_cents": "3500",
+      "notas": null,
+      "fecha_creacion": "2026-04-08 09:42:52.175049"
+    },
+    {
+      "id": "8",
+      "session_id": "9f95f6c6-d3c9-43ce-b6e1-b8ed81556b61",
+      "nombre_cliente": "Jonathan Neto",
+      "email_cliente": "natescripts@gmail.com",
+      "direccion": "Calle Martínez Seco 44, piso",
+      "estado": "cancelado",
+      "total_cents": "3500",
+      "notas": null,
+      "fecha_creacion": "2026-04-08 10:22:26.844159"
+    },
+    {
+      "id": "9",
+      "session_id": "7f22af9e-bbba-4751-a822-5cfa86f8f404",
+      "nombre_cliente": "Jonathan Neto",
+      "email_cliente": "natescripts@mail.com",
+      "direccion": "calle martínez seco 44, piso",
+      "estado": "pendiente",
+      "total_cents": "1500",
+      "notas": null,
+      "fecha_creacion": "2026-04-08 10:33:24.094327"
+    },
+    {
+      "id": "10",
+      "session_id": "1860bb1f-c58e-4dd1-8fe3-b5352804ded4",
+      "nombre_cliente": "Jonathan Neto",
+      "email_cliente": "natescripts@gmail.com",
+      "direccion": "calle Martínez seco 44, piso",
+      "estado": "pendiente",
+      "total_cents": "1500",
+      "notas": null,
+      "fecha_creacion": "2026-04-08 10:46:02.225098"
+    },
+    {
+      "id": "11",
+      "session_id": "98aba8a2-d9d3-4a77-b052-245ed5d5fb81",
+      "nombre_cliente": "Jonathan Neto",
+      "email_cliente": "natescripts@gmail.com",
+      "direccion": "Calle Martínez Seco 44, piso",
+      "estado": "pendiente",
+      "total_cents": "3500",
+      "notas": null,
+      "fecha_creacion": "2026-04-08 10:50:11.757937"
+    },
+    {
+      "id": "12",
+      "session_id": "be348fe6-9fdd-4b27-8867-2af8596f1a7e",
+      "nombre_cliente": "completo para continuar con el pedido",
+      "email_cliente": "natescripts@gmail.com",
+      "direccion": "calle, número, código postal y ciudad. calle general pardiñas 36 Jonathan, gracias por la dirección. Ahora solo necesito saber tu email de contacto para po",
+      "estado": "pendiente",
+      "total_cents": "3500",
+      "notas": null,
+      "fecha_creacion": "2026-04-08 12:43:25.916419"
+    },
+    {
+      "id": "13",
+      "session_id": "646faf32-a5ae-4b2f-bd5e-ce318a0883e8",
+      "nombre_cliente": "Jonathan Neto",
+      "email_cliente": "natescripts@gmail.com",
+      "direccion": "Calle Martínez Seco, 44, piso 3 izquierdo Notado, Jonathan. Tu dirección de envío es:",
+      "estado": "pendiente",
+      "total_cents": "3500",
+      "notas": null,
+      "fecha_creacion": "2026-04-09 08:25:24.971957"
+    },
+    {
+      "id": "14",
+      "session_id": "06cdfce6-ed62-44e0-b62b-ba32e33c2849",
+      "nombre_cliente": "completo para proseguir con el pedido",
+      "email_cliente": "natescripts@gmail.com",
+      "direccion": "Calle Martínez Seco 44, piso 3 izquierdo",
+      "estado": "pendiente",
+      "total_cents": "3500",
+      "notas": null,
+      "fecha_creacion": "2026-04-09 08:34:24.000156"
+    },
+    {
+      "id": "15",
+      "session_id": "e541f93a-8066-4aca-bdc4-3134035ddcc4",
+      "nombre_cliente": "Cliente ThreadCo",
+      "email_cliente": "natescripts@gmail.com",
+      "direccion": "Calle General Pardiñas, 36",
+      "estado": "pendiente",
+      "total_cents": "3500",
+      "notas": null,
+      "fecha_creacion": "2026-04-09 08:39:08.412218"
+    },
+    {
+      "id": "16",
+      "session_id": "4220c947-7b2e-4b8e-92d4-a1c90dede26a",
+      "nombre_cliente": "Jonathan Neto",
+      "email_cliente": "natescripts@gmail.com",
+      "direccion": "calle Martínez Seco 44, piso 3 izquierdo",
+      "estado": "cancelado",
+      "total_cents": "3500",
+      "notas": null,
+      "fecha_creacion": "2026-04-09 09:45:26.920513"
+    },
+    {
+      "id": "17",
+      "session_id": "d2e3d8a7-9e3e-467a-abf4-fc3d141124a4",
+      "nombre_cliente": "Cliente ThreadCo",
+      "email_cliente": "natescripts@gmail.com",
+      "direccion": "Calle Martínez Seco 44, piso 3 izquierdo",
+      "estado": "cancelado",
+      "total_cents": "3500",
+      "notas": null,
+      "fecha_creacion": "2026-04-10 08:15:51.349914"
+    },
+    {
+      "id": "18",
+      "session_id": "d2e3d8a7-9e3e-467a-abf4-fc3d141124a4",
+      "nombre_cliente": "Lo quiero cancelar",
+      "email_cliente": "natescripts@gmail.com",
+      "direccion": "Calle Martínez Seco 44, 3 izquiero",
+      "estado": "cancelado",
+      "total_cents": "4500",
+      "notas": null,
+      "fecha_creacion": "2026-04-10 08:20:25.880243"
+    },
+    {
+      "id": "19",
+      "session_id": "13372616-c031-4c32-8782-42d1612f103b",
+      "nombre_cliente": "Allan dos Santos",
+      "email_cliente": "natescripts@gmail.com",
+      "direccion": "Calle Martínez Seco 44, piso 3 izquierdo",
+      "estado": "cancelado",
+      "total_cents": "0",
+      "notas": null,
+      "fecha_creacion": "2026-04-10 08:26:29.013525"
+    },
+    {
+      "id": "20",
+      "session_id": "d56285b6-24b2-4216-bc22-11e775e1cf4f",
+      "nombre_cliente": "Allan dos Santos",
+      "email_cliente": "natescripts@gmail.com",
+      "direccion": "Calle Martínez Seco 44, piso 3 izquierdo",
+      "estado": "cancelado",
+      "total_cents": "3500",
+      "notas": null,
+      "fecha_creacion": "2026-04-10 08:42:55.296913"
+    },
+    {
+      "id": "21",
+      "session_id": "a2e365f8-308e-48e4-a8f9-37176dd2a8b2",
+      "nombre_cliente": "Ver catálogo",
+      "email_cliente": "natescripts@gmail.com",
+      "direccion": "Calle Amaniel 6, Madrid España",
+      "estado": "confirmado",
+      "total_cents": "1500",
+      "notas": null,
+      "fecha_creacion": "2026-04-13 10:19:22.390149"
+    },
+    {
+      "id": "22",
+      "session_id": "b4e140f8-f76b-425f-bf2e-32c35ec78da3",
+      "nombre_cliente": "Allan dos Santos",
+      "email_cliente": "natescripts@gmail.com",
+      "direccion": "Calle Amaniel 6, Madrid España",
+      "estado": "confirmado",
+      "total_cents": "3500",
+      "notas": null,
+      "fecha_creacion": "2026-04-13 10:50:46.770678"
+    }
+  ],
+  "lineas_pedido": [
+    {
+      "id": "1",
+      "pedido_id": "1",
+      "producto_id": "3",
+      "cantidad": "1",
+      "precio_unidad_cents": "3500",
+      "talla": "M"
+    },
+    {
+      "id": "2",
+      "pedido_id": "1",
+      "producto_id": "1",
+      "cantidad": "2",
+      "precio_unidad_cents": "1500",
+      "talla": "L"
+    },
+    {
+      "id": "3",
+      "pedido_id": "3",
+      "producto_id": "2",
+      "cantidad": "1",
+      "precio_unidad_cents": "1500",
+      "talla": "L"
+    },
+    {
+      "id": "4",
+      "pedido_id": "4",
+      "producto_id": "2",
+      "cantidad": "1",
+      "precio_unidad_cents": "1500",
+      "talla": "L"
+    },
+    {
+      "id": "5",
+      "pedido_id": "5",
+      "producto_id": "2",
+      "cantidad": "1",
+      "precio_unidad_cents": "1500",
+      "talla": "L"
+    },
+    {
+      "id": "6",
+      "pedido_id": "6",
+      "producto_id": "3",
+      "cantidad": "1",
+      "precio_unidad_cents": "3500",
+      "talla": "XL"
+    },
+    {
+      "id": "7",
+      "pedido_id": "7",
+      "producto_id": "3",
+      "cantidad": "1",
+      "precio_unidad_cents": "3500",
+      "talla": "XL"
+    },
+    {
+      "id": "8",
+      "pedido_id": "8",
+      "producto_id": "3",
+      "cantidad": "1",
+      "precio_unidad_cents": "3500",
+      "talla": "XL"
+    },
+    {
+      "id": "9",
+      "pedido_id": "9",
+      "producto_id": "1",
+      "cantidad": "1",
+      "precio_unidad_cents": "1500",
+      "talla": "XL"
+    },
+    {
+      "id": "10",
+      "pedido_id": "10",
+      "producto_id": "2",
+      "cantidad": "1",
+      "precio_unidad_cents": "1500",
+      "talla": "XL"
+    },
+    {
+      "id": "11",
+      "pedido_id": "11",
+      "producto_id": "3",
+      "cantidad": "1",
+      "precio_unidad_cents": "3500",
+      "talla": "XL"
+    },
+    {
+      "id": "12",
+      "pedido_id": "12",
+      "producto_id": "3",
+      "cantidad": "1",
+      "precio_unidad_cents": "3500",
+      "talla": "XL"
+    },
+    {
+      "id": "13",
+      "pedido_id": "13",
+      "producto_id": "3",
+      "cantidad": "1",
+      "precio_unidad_cents": "3500",
+      "talla": "XL"
+    },
+    {
+      "id": "14",
+      "pedido_id": "14",
+      "producto_id": "3",
+      "cantidad": "1",
+      "precio_unidad_cents": "3500",
+      "talla": "XL"
+    },
+    {
+      "id": "15",
+      "pedido_id": "15",
+      "producto_id": "3",
+      "cantidad": "1",
+      "precio_unidad_cents": "3500",
+      "talla": "XL"
+    },
+    {
+      "id": "16",
+      "pedido_id": "16",
+      "producto_id": "3",
+      "cantidad": "1",
+      "precio_unidad_cents": "3500",
+      "talla": "XL"
+    },
+    {
+      "id": "17",
+      "pedido_id": "17",
+      "producto_id": "3",
+      "cantidad": "1",
+      "precio_unidad_cents": "3500",
+      "talla": "XL"
+    },
+    {
+      "id": "18",
+      "pedido_id": "18",
+      "producto_id": "4",
+      "cantidad": "1",
+      "precio_unidad_cents": "4500",
+      "talla": "32"
+    },
+    {
+      "id": "19",
+      "pedido_id": "20",
+      "producto_id": "3",
+      "cantidad": "1",
+      "precio_unidad_cents": "3500",
+      "talla": "XL"
+    },
+    {
+      "id": "20",
+      "pedido_id": "21",
+      "producto_id": "1",
+      "cantidad": "1",
+      "precio_unidad_cents": "1500",
+      "talla": "M"
+    },
+    {
+      "id": "21",
+      "pedido_id": "22",
+      "producto_id": "3",
+      "cantidad": "1",
+      "precio_unidad_cents": "3500",
+      "talla": "M"
+    }
+  ],
+  "solicitudes_factura": [
+    {
+      "id": "1",
+      "session_id": "test_factura",
+      "email_cliente": "ana@test.com",
+      "pedido_id": "1",
+      "procesada": "False",
+      "fecha": "2026-03-19 11:13:45.604059"
+    },
+    {
+      "id": "2",
+      "session_id": "test_factura",
+      "email_cliente": "ana@test.com",
+      "pedido_id": "1",
+      "procesada": "False",
+      "fecha": "2026-03-19 11:21:39.890630"
+    },
+    {
+      "id": "3",
+      "session_id": "test_factura",
+      "email_cliente": "ana@test.com",
+      "pedido_id": "1",
+      "procesada": "False",
+      "fecha": "2026-03-19 11:32:04.693853"
+    },
+    {
+      "id": "4",
+      "session_id": "test_factura",
+      "email_cliente": "ana@test.com",
+      "pedido_id": "1",
+      "procesada": "False",
+      "fecha": "2026-03-19 11:33:47.184413"
+    },
+    {
+      "id": "5",
+      "session_id": "test",
+      "email_cliente": "ana@test.com",
+      "pedido_id": "1",
+      "procesada": "False",
+      "fecha": "2026-03-19 11:34:55.567126"
+    },
+    {
+      "id": "6",
+      "session_id": "test_factura",
+      "email_cliente": "ana@test.com",
+      "pedido_id": "1",
+      "procesada": "False",
+      "fecha": "2026-03-19 11:36:19.283880"
+    },
+    {
+      "id": "7",
+      "session_id": "test_factura",
+      "email_cliente": "ana@test.com",
+      "pedido_id": "1",
+      "procesada": "False",
+      "fecha": "2026-03-19 11:37:03.715118"
+    },
+    {
+      "id": "8",
+      "session_id": "test_factura",
+      "email_cliente": "ana@test.com",
+      "pedido_id": "1",
+      "procesada": "False",
+      "fecha": "2026-03-19 11:43:38.095731"
+    },
+    {
+      "id": "9",
+      "session_id": "prueba_1",
+      "email_cliente": "ana@test.com",
+      "pedido_id": "1",
+      "procesada": "False",
+      "fecha": "2026-03-23 11:54:00.213336"
+    }
+  ],
+  "alertas": [
+    {
+      "id": "2",
+      "tipo": "stock_bajo",
+      "producto_id": "6",
+      "mensaje": "Los shorts cargo beige tiene stock bajo",
+      "enviada": "True",
+      "fecha": "2026-03-19 07:11:05.585959"
+    },
+    {
+      "id": "1",
+      "tipo": "stock_bajo",
+      "producto_id": "5",
+      "mensaje": "La chaqueta bomber negra tiene stock bajo",
+      "enviada": "True",
+      "fecha": "2026-03-19 07:38:08.098096"
+    }
+  ],
+  "configuracion": [
+    {
+      "id": "2",
+      "clave": "saludo_bienvenida",
+      "valor": "¡Bienvenido a ThreadCo! ¿En qué puedo ayudarte?",
+      "descripcion": "Mensaje de bienvenida del chatbot"
+    },
+    {
+      "id": "3",
+      "clave": "tono_bot",
+      "valor": "amable y profesional",
+      "descripcion": "Tono y personalidad del asistente"
+    },
+    {
+      "id": "4",
+      "clave": "producto_destacado",
+      "valor": "",
+      "descripcion": "Producto que el bot menciona primero (dejar vacío para ninguno)"
+    },
+    {
+      "id": "5",
+      "clave": "oferta_activa",
+      "valor": "",
+      "descripcion": "Mensaje de oferta que el bot menciona (dejar vacío para ninguna)"
+    },
+    {
+      "id": "6",
+      "clave": "bot_activo",
+      "valor": "true",
+      "descripcion": "Si el bot está activo o en mantenimiento"
+    },
+    {
+      "id": "1",
+      "clave": "nombre_tienda",
+      "valor": "WinoWin",
+      "descripcion": "Nombre de la tienda que usa el bot"
+    }
+  ]
+}
